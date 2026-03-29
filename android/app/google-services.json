@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654248867512",
+    "project_id": "ink-and-3cho",
+    "storage_bucket": "ink-and-3cho.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654248867512:android:e8800379f3ae127e88e64d",
+        "android_client_info": {
+          "package_name": "com.example.inkandecho"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMIR68DqFgj5tVu-me3j_BUeO5mwKkxFk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
