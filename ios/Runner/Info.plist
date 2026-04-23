@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to capture book covers and pages for your journal.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Used to record voice reflections for your entries.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Used to select photos for your journal entries.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
