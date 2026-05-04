@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary-container": "#86f8c8",
+              "on-secondary": "#ffffff",
+              "outline": "#838175",
+              "outline-variant": "#bcb9ad",
+              "inverse-surface": "#0f0e0b",
+              "surface-variant": "#ece8db",
+              "error": "#b33938",
+              "surface-tint": "#007352",
+              "surface-container-lowest": "#ffffff",
+              "on-surface": "#39382f",
+              "inverse-primary": "#8cfece",
+              "inverse-on-surface": "#9f9d97",
+              "surface-container-highest": "#ece8db",
+              "on-primary": "#ffffff",
+              "primary": "#007352",
+              "on-tertiary-fixed-variant": "#704f3d",
+              "on-tertiary": "#ffffff",
+              "surface": "#fffbff",
+              "tertiary-container": "#fed0b9",
+              "primary-fixed": "#86f8c8",
+              "tertiary": "#7f5d4a",
+              "on-secondary-fixed": "#64311f",
+              "surface-container-low": "#fdf9f1",
+              "tertiary-fixed": "#fed0b9",
+              "primary-fixed-dim": "#78e9bb",
+              "on-tertiary-fixed": "#503323",
+              "on-secondary-fixed-variant": "#864c38",
+              "primary-dim": "#006548",
+              "secondary-fixed": "#ffdbcf",
+              "tertiary-fixed-dim": "#efc3ac",
+              "on-primary-fixed": "#004933",
+              "on-secondary-container": "#7a432f",
+              "background": "#fffbff",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#654534",
+              "error-dim": "#70030f",
+              "error-container": "#f56965",
+              "secondary-container": "#ffdbcf",
+              "surface-dim": "#e6e3d3",
+              "on-error-container": "#65000b",
+              "secondary-fixed-dim": "#ffc8b6",
+              "tertiary-dim": "#72513f",
+              "on-surface-variant": "#66655a",
+              "secondary-dim": "#824935",
+              "surface-container-high": "#f1eee2",
+              "on-primary-fixed-variant": "#00694b",
+              "on-background": "#39382f",
+              "secondary": "#905540",
+              "on-primary-container": "#005e43",
+              "surface-container": "#f7f3ea",
+              "surface-bright": "#fffbff"
+            },
+            fontFamily: {
+              "notoSerif": ["Noto Serif", "serif"],
+              "plusJakartaSans": ["Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fffbff;
+        }
+        .editorial-shadow {
+            box-shadow: 0 24px 32px -4px rgba(57, 56, 47, 0.06);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col items-center justify-start overflow-x-hidden">
+<!-- Top Navigation Anchor (Shared Component: TopAppBar) -->
+<!-- Suppression logic: Since this is an Authentication screen, we use a simplified branding header -->
+<header class="fixed top-0 w-full z-50 bg-[#fffbff]/70 backdrop-blur-xl flex items-center justify-center px-6 py-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#3EB489]" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<h1 class="font-notoSerif italic text-[#3EB489] text-2xl font-semibold tracking-tight">Ink &amp; Echo</h1>
+</div>
+</header>
+<main class="w-full max-w-md px-6 pt-24 pb-12 flex flex-col items-center">
+<!-- Hero Illustration Area (The "Sanctuary" visual) -->
+<div class="relative w-full aspect-square mb-10 mt-4">
+<div class="absolute inset-0 bg-surface-container rounded-xl overflow-hidden editorial-shadow">
+<img alt="Cozy reading nook" class="w-full h-full object-cover mix-blend-multiply opacity-80" data-alt="A cozy indoor reading nook with a stack of vintage books, a warm ceramic mug of tea, and soft morning light filtering through linen curtains." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZtRjN2vfMJxIzWgteS0h1Vop90OXWs8oIt3jF3obODPKHSHKDHC1ZuMSmyjrNZad0B8vQi4NyJnhp-4O65S6lBlppft4c-Ab3mp1E1jyF4seqI_GPHJAmEneF4RzOigkkA3xA-fXUTr3flZrzdQIsDPVq2Z7SILbGnfcRcojsYS1wB1w7WGo7sCbUtkgekfJ-HEYLtcr24M80thobnc9Y9PTiXT6_rxfwkJTKLsva31rZ4IUbtSdXwkAFCA5dMas0HEjwD9tudg"/>
+<!-- Vellum Overlay for Quote -->
+<div class="absolute bottom-6 left-6 right-6 bg-surface/40 backdrop-blur-[40px] p-6 rounded-lg">
+<p class="font-notoSerif italic text-on-surface text-lg leading-relaxed">
+                        "A room without books is like a body without a soul."
+                    </p>
+<span class="block mt-2 font-plusJakartaSans text-[11px] uppercase tracking-widest text-on-surface-variant font-medium">Cicero</span>
+</div>
+</div>
+<!-- Decorative "Stickers/Tabs" -->
+<div class="absolute -top-4 -right-2 bg-secondary-container text-on-secondary-container px-4 py-1 rounded-full font-plusJakartaSans text-xs font-bold editorial-shadow transform rotate-6">
+                New Chapter
+            </div>
+<div class="absolute -bottom-2 -left-4 bg-primary-container text-on-primary-container p-3 rounded-full editorial-shadow">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+</div>
+</div>
+<!-- Content Section -->
+<div class="w-full text-center mb-10">
+<h2 class="font-notoSerif text-3xl font-bold text-on-surface mb-3">Welcome Home</h2>
+<p class="font-plusJakartaSans text-on-surface-variant leading-relaxed px-4">
+                Your personal digital sanctuary for thoughts, highlights, and literary journeys.
+            </p>
+</div>
+<!-- Form / Action Section -->
+<div class="w-full space-y-4">
+<!-- Sign Up Primary CTA -->
+<button class="w-full bg-gradient-to-br from-primary to-primary-container text-on-primary py-4 px-6 rounded-full font-plusJakartaSans font-bold text-lg editorial-shadow active:scale-95 transition-transform duration-200 flex items-center justify-center gap-2">
+<span>Start Your Journal</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<!-- Login Secondary Action -->
+<button class="w-full bg-surface-container-highest text-on-surface py-4 px-6 rounded-full font-plusJakartaSans font-semibold text-lg active:scale-95 transition-transform duration-200">
+                Sign In to Vault
+            </button>
+</div>
+<!-- Semantic Divider -->
+<div class="w-24 h-2 bg-surface-dim rounded-full my-10"></div>
+<!-- Social/Quick Auth Options -->
+<div class="w-full">
+<p class="text-center font-plusJakartaSans text-xs text-on-surface-variant uppercase tracking-[0.2em] mb-6">Or continue with</p>
+<div class="flex justify-center gap-6">
+<button class="bg-surface-container-low p-4 rounded-xl editorial-shadow active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface" data-icon="google">google</span>
+</button>
+<button class="bg-surface-container-low p-4 rounded-xl editorial-shadow active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface" data-icon="apple">ios</span>
+</button>
+<button class="bg-surface-container-low p-4 rounded-xl editorial-shadow active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-on-surface" data-icon="mail">mail</span>
+</button>
+</div>
+</div>
+<!-- Footer Policy -->
+<footer class="mt-12 text-center">
+<p class="font-plusJakartaSans text-[11px] text-on-surface-variant leading-relaxed max-w-[240px] mx-auto">
+                By entering the sanctuary, you agree to our <span class="text-primary underline font-medium">Terms of Ink</span> and <span class="text-primary underline font-medium">Privacy Echoes</span>.
+            </p>
+</footer>
+</main>
+<!-- Navigation Shell Suppression: As per rules, we suppress the BottomNavBar on Authentication/Focused tasks to prioritize the content canvas. -->
+</body></html>
