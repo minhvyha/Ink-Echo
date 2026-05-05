@@ -294,6 +294,7 @@ class LoginPage extends StatelessWidget {
                           },
                         ),
                       ],
+                      
                     ),
                     const SizedBox(height: 26),
                     const Padding(
