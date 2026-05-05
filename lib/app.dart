@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/main_shell.dart';
+import 'auth/auth_gate.dart';
 
 class InkEchoApp extends StatelessWidget {
   const InkEchoApp({super.key});
@@ -11,13 +11,13 @@ class InkEchoApp extends StatelessWidget {
       title: 'Ink & Echo',
       theme: ThemeData(
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFFDF8F4),
+        scaffoldBackgroundColor: const Color(0xFFfffbff),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2BBF9B),
+          seedColor: const Color(0xFF007352),
           brightness: Brightness.light,
         ),
       ),
-      home: const MainShell(),
+      home: const AuthGate(),
     );
   }
 }
