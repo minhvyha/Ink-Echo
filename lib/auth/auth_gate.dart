@@ -1,37 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../pages/login_page.dart';
 import '../pages/main_shell.dart';
 
-class AuthGate extends StatefulWidget {
+class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
   @override
-  State<AuthGate> createState() => _AuthGateState();
-}
-
-class _AuthGateState extends State<AuthGate> {
-  bool _isSignedIn = false;
-
-  void _handleLogin() {
-    setState(() {
-      _isSignedIn = true;
-    });
-  }
-
-  void _handleLogout() {
-    setState(() {
-      _isSignedIn = false;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isSignedIn) {
-      return MainShell(onLogout: _handleLogout);
-    }
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // loading
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    return LoginPage(
-      onLogin: _handleLogin,
+        // logged in
+        if (snapshot.hasData) {
+          return MainShell(
+            onLogout: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+          );
+        }
+
+        // not logged in
+        return const LoginPage();
+      },
     );
   }
 }

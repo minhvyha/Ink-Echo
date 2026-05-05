@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
-  final VoidCallback onLogin;
 
-  const LoginPage({
-    super.key,
-    required this.onLogin,
-  });
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -181,7 +177,13 @@ class LoginPage extends StatelessWidget {
                       width: double.infinity,
                       height: 58,
                       child: ElevatedButton(
-                        onPressed: onLogin,
+                        onPressed: () async {
+  try {
+    await AuthService().signInWithGoogle();
+  } catch (e) {
+    debugPrint(e.toString());
+  }
+},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF007352),
                           foregroundColor: Colors.white,
@@ -213,7 +215,13 @@ class LoginPage extends StatelessWidget {
                       width: double.infinity,
                       height: 58,
                       child: OutlinedButton(
-                        onPressed: onLogin,
+                        onPressed: () async {
+                          try {
+                            await AuthService().signInWithGoogle();
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
                         style: OutlinedButton.styleFrom(
                           backgroundColor: const Color(0xFFF1EEE2),
                           foregroundColor: const Color(0xFF39382F),
@@ -255,17 +263,35 @@ class LoginPage extends StatelessWidget {
                       children: [
                         _QuickAuthButton(
                           icon: Icons.g_mobiledata,
-                          onTap: onLogin,
+                          onTap: () async {
+                            try {
+                              await AuthService().signInWithGoogle();
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          },
                         ),
                         const SizedBox(width: 16),
                         _QuickAuthButton(
                           icon: Icons.apple,
-                          onTap: onLogin,
+                          onTap: () async {
+                            try {
+                              await AuthService().signInWithGoogle();
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          },
                         ),
                         const SizedBox(width: 16),
                         _QuickAuthButton(
                           icon: Icons.email_outlined,
-                          onTap: onLogin,
+                          onTap: () async {
+                            try {
+                              await AuthService().signInWithGoogle();
+                            } catch (e) {
+                              debugPrint(e.toString());
+                            }
+                          },
                         ),
                       ],
                     ),
