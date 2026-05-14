@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
-import 'home_page.dart';
 import 'vault_page.dart';
 import 'reflection_page.dart';
 
@@ -20,7 +19,6 @@ class _MainShellState extends State<MainShell> {
   int _index = 0;
 
   final _pages = const [
-    HomePage(),
     VaultPage(),
     ReflectionPage(),
   ];

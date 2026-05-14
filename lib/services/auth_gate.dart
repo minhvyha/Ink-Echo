@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:inkandecho/services/auth_service.dart';
 import 'package:inkandecho/pages/login_page.dart';
-import 'package:inkandecho/pages/home_page.dart';
+import 'package:inkandecho/pages/main_shell.dart';
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -12,9 +12,15 @@ class AuthGate extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: AuthService.instance.authStateChanges,
       builder: (context, snapshot) {
+        User? user = snapshot.data;
+        if (user == null &&
+            snapshot.connectionState == ConnectionState.waiting) {
+          user = AuthService.instance.currentUser;
+        }
+
         debugPrint(
           'AuthGate: connection=${snapshot.connectionState}, '
-          'hasData=${snapshot.hasData}, user=${snapshot.data?.email}',
+          'hasData=${snapshot.hasData}, user=${user?.email}',
         );
 
         if (snapshot.hasError) {
@@ -25,14 +31,18 @@ class AuthGate extends StatelessWidget {
           );
         }
 
+        if (user != null) {
+          return MainShell(
+            onLogout: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+          );
+        }
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
-        }
-
-        if (snapshot.data != null) {
-          return const HomePage();
         }
 
         return const LoginPage();
