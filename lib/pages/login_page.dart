@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:inkandecho/services/auth_service.dart';
 
 class LoginPage extends StatelessWidget {
-
   const LoginPage({super.key});
 
   @override
@@ -178,12 +178,12 @@ class LoginPage extends StatelessWidget {
                       height: 58,
                       child: ElevatedButton(
                         onPressed: () async {
-  try {
-    await AuthService().signInWithGoogle();
-  } catch (e) {
-    debugPrint(e.toString());
-  }
-},
+                          try {
+                            await AuthService.instance.signInWithGoogle();
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF007352),
                           foregroundColor: Colors.white,
@@ -217,7 +217,7 @@ class LoginPage extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () async {
                           try {
-                            await AuthService().signInWithGoogle();
+                            await AuthService.instance.signInWithGoogle();
                           } catch (e) {
                             debugPrint(e.toString());
                           }
@@ -265,7 +265,7 @@ class LoginPage extends StatelessWidget {
                           icon: Icons.g_mobiledata,
                           onTap: () async {
                             try {
-                              await AuthService().signInWithGoogle();
+                              await AuthService.instance.signInWithGoogle();
                             } catch (e) {
                               debugPrint(e.toString());
                             }
@@ -276,7 +276,7 @@ class LoginPage extends StatelessWidget {
                           icon: Icons.apple,
                           onTap: () async {
                             try {
-                              await AuthService().signInWithGoogle();
+                              await AuthService.instance.signInWithGoogle();
                             } catch (e) {
                               debugPrint(e.toString());
                             }
@@ -287,14 +287,13 @@ class LoginPage extends StatelessWidget {
                           icon: Icons.email_outlined,
                           onTap: () async {
                             try {
-                              await AuthService().signInWithGoogle();
+                              await AuthService.instance.signInWithGoogle();
                             } catch (e) {
                               debugPrint(e.toString());
                             }
                           },
                         ),
                       ],
-                      
                     ),
                     const SizedBox(height: 26),
                     const Padding(
@@ -325,10 +324,7 @@ class _QuickAuthButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
-  const _QuickAuthButton({
-    required this.icon,
-    required this.onTap,
-  });
+  const _QuickAuthButton({required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

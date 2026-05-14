@@ -1,53 +1,36 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
+  AuthService._();
+  static final AuthService instance = AuthService._();
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
 
   User? get currentUser => _auth.currentUser;
-
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<void> signInAnonymously() async {
-    await _auth.signInAnonymously();
-  }
-
-  Future<UserCredential> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    return await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
+  Future<void> init() async {
+    await _googleSignIn.initialize(
+      clientId: kIsWeb ? 'YOUR_WEB_OAUTH_CLIENT_ID' : null,
     );
   }
 
-  Future<UserCredential> registerWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    return await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-  }
+  Future<UserCredential> signInWithGoogle() async {
+    if (kIsWeb) {
+      final provider = GoogleAuthProvider();
+      return _auth.signInWithPopup(provider);
+    }
 
-  Future<void> signInWithGoogle() async {
-    final googleUser = await GoogleSignIn().signIn();
-
-    if (googleUser == null) return;
-
-    final googleAuth = await googleUser.authentication;
+    final googleUser = await _googleSignIn.authenticate();
+    final googleAuth = googleUser.authentication;
 
     final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
-    await _auth.signInWithCredential(credential);
-  }
-
-  Future<void> signOut() async {
-    await _auth.signOut();
+    return _auth.signInWithCredential(credential);
   }
 }
