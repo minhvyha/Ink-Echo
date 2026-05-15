@@ -4,45 +4,54 @@ class GradientButton extends StatelessWidget {
   final String text;
   final IconData icon;
   final LinearGradient gradient;
+  final VoidCallback? onPressed;
 
   const GradientButton({
     super.key,
     required this.text,
     required this.icon,
     required this.gradient,
+    this.onPressed,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60,
-      decoration: BoxDecoration(
-        gradient: gradient,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
         borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1B9C7A).withOpacity(0.22),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              text,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w800,
-                fontSize: 18,
+        child: Ink(
+          height: 60,
+          decoration: BoxDecoration(
+            gradient: gradient,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1B9C7A).withOpacity(0.22),
+                blurRadius: 18,
+                offset: const Offset(0, 8),
               ),
+            ],
+          ),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  text,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Icon(icon, color: Colors.white, size: 22),
+              ],
             ),
-            const SizedBox(width: 10),
-            Icon(icon, color: Colors.white, size: 22),
-          ],
+          ),
         ),
       ),
     );

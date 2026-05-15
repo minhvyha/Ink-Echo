@@ -1,9 +1,78 @@
 import 'package:flutter/material.dart';
 import '../widgets/app_header.dart';
 import '../widgets/common_buttons.dart';
+import '../services/book_service.dart';
 
-class ReflectionPage extends StatelessWidget {
-  const ReflectionPage({super.key});
+class ReflectionPage extends StatefulWidget {
+  final VoidCallback? onBookSaved;
+
+  const ReflectionPage({super.key, this.onBookSaved});
+
+  @override
+  State<ReflectionPage> createState() => _ReflectionPageState();
+}
+
+class _ReflectionPageState extends State<ReflectionPage> {
+  final _title = TextEditingController();
+  final _author = TextEditingController();
+  final _echo = TextEditingController();
+  String? _mood;
+  bool _saving = false;
+
+  static const _moods = [
+    'Inspiring',
+    'Deeply Moving',
+    'Challenging',
+    'Nostalgic',
+  ];
+
+  @override
+  void dispose() {
+    _title.dispose();
+    _author.dispose();
+    _echo.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveBook() async {
+    if (_saving) return;
+    final title = _title.text.trim();
+    final author = _author.text.trim();
+    if (title.isEmpty || author.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please add a title and author before saving.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _saving = true);
+    try {
+      await BookService.instance.saveBook(
+        title: title,
+        author: author,
+        echo: _echo.text.trim(),
+        mood: _mood,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Book saved to your shelf.')),
+      );
+      _title.clear();
+      _author.clear();
+      _echo.clear();
+      setState(() => _mood = null);
+      widget.onBookSaved?.call();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not save: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +87,7 @@ class ReflectionPage extends StatelessWidget {
             child: Column(
               children: [
                 Text(
-                  'New Reflection',
+                  'Add a book',
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w800,
@@ -28,7 +97,7 @@ class ReflectionPage extends StatelessWidget {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Capture a moment from your latest read.',
+                  'Save a volume to your shelf — it will appear on Home.',
                   style: TextStyle(
                     fontSize: 15,
                     color: Color(0xFF7E756D),
@@ -68,67 +137,72 @@ class ReflectionPage extends StatelessWidget {
           ),
           const SizedBox(height: 28),
           const _FieldLabel('THE VOLUME'),
-          const _TextFieldMock(hint: 'What are you reading?', icon: Icons.menu_book_outlined),
+          _BookTextField(
+            controller: _title,
+            hint: 'Book title',
+            icon: Icons.menu_book_outlined,
+          ),
           const SizedBox(height: 18),
           const _FieldLabel('THE VOICE'),
-          const _TextFieldMock(hint: "Author's name"),
+          _BookTextField(
+            controller: _author,
+            hint: "Author's name",
+            icon: Icons.person_outline,
+          ),
           const SizedBox(height: 18),
           const _FieldLabel('THE ECHO'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: Container(
-              height: 190,
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF8F1E5),
-                borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: const Color(0xFFE7E0D1)),
+            child: TextField(
+              controller: _echo,
+              minLines: 4,
+              maxLines: 8,
+              style: const TextStyle(
+                color: Color(0xFF4D433D),
+                fontSize: 16,
+                height: 1.4,
               ),
-              child: Stack(
-                children: [
-                  const Text(
-                    '“Words that stayed with you...”',
-                    style: TextStyle(
-                      color: Color(0xFFC2B7A8),
-                      fontSize: 22,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF5D6CA),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Text(
-                        '★ FAVORITE',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: Color(0xFF8C5341),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              decoration: InputDecoration(
+                hintText: 'Words that stayed with you…',
+                hintStyle: TextStyle(
+                  color: const Color(0xFF4D433D).withValues(alpha: 0.45),
+                  fontSize: 18,
+                  fontStyle: FontStyle.italic,
+                ),
+                filled: true,
+                fillColor: const Color(0xFFF8F1E5),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFFE7E0D1)),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFFE7E0D1)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(28),
+                  borderSide: const BorderSide(color: Color(0xFF1B9C7A), width: 1.4),
+                ),
+                contentPadding: const EdgeInsets.all(18),
               ),
             ),
           ),
           const SizedBox(height: 18),
           const _FieldLabel('THE MOOD'),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
             child: Wrap(
               spacing: 10,
               runSpacing: 10,
               children: [
-                _MoodChip(text: 'Inspiring', selected: false),
-                _MoodChip(text: 'Deeply Moving', selected: true),
-                _MoodChip(text: 'Challenging', selected: false),
-                _MoodChip(text: 'Nostalgic', selected: false),
+                for (final m in _moods)
+                  _MoodChip(
+                    text: m,
+                    selected: _mood == m,
+                    onTap: () => setState(() {
+                      _mood = _mood == m ? null : m;
+                    }),
+                  ),
               ],
             ),
           ),
@@ -165,18 +239,69 @@ class ReflectionPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
             child: GradientButton(
-              text: 'Preserve Reflection',
+              text: _saving ? 'Saving…' : 'Save book',
               icon: Icons.arrow_forward,
-              gradient: LinearGradient(
+              gradient: const LinearGradient(
                 colors: [Color(0xFF1B9C7A), Color(0xFF7FECBA)],
               ),
+              onPressed: _saving ? null : _saveBook,
             ),
           ),
           const SizedBox(height: 30),
         ],
+      ),
+    );
+  }
+}
+
+class _BookTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hint;
+  final IconData icon;
+
+  const _BookTextField({
+    required this.controller,
+    required this.hint,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22),
+      child: TextField(
+        controller: controller,
+        textCapitalization: TextCapitalization.sentences,
+        style: const TextStyle(
+          fontSize: 15,
+          color: Color(0xFF4D433D),
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            fontSize: 15,
+            color: Color(0xFFC0B5A5),
+          ),
+          filled: true,
+          fillColor: const Color(0xFFF8F1E5),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: const BorderSide(color: Color(0xFF1B9C7A), width: 1.2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+          suffixIcon: Icon(icon, color: const Color(0xFFBFB4A6), size: 22),
+        ),
       ),
     );
   }
@@ -203,61 +328,38 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
-class _TextFieldMock extends StatelessWidget {
-  final String hint;
-  final IconData? icon;
-  const _TextFieldMock({required this.hint, this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22),
-      child: Container(
-        height: 60,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8F1E5),
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                hint,
-                style: const TextStyle(
-                  fontSize: 15,
-                  color: Color(0xFFC0B5A5),
-                ),
-              ),
-            ),
-            if (icon != null)
-              Icon(icon, color: const Color(0xFFBFB4A6), size: 22),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _MoodChip extends StatelessWidget {
   final String text;
   final bool selected;
-  const _MoodChip({required this.text, required this.selected});
+  final VoidCallback onTap;
+
+  const _MoodChip({
+    required this.text,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: selected ? const Color(0xFF85EFC1) : const Color(0xFFF0EBDD),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: selected ? const Color(0xFF0D5C4A) : const Color(0xFF5A544E),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: selected ? const Color(0xFF85EFC1) : const Color(0xFFF0EBDD),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: selected ? const Color(0xFF0D5C4A) : const Color(0xFF5A544E),
+            ),
+          ),
         ),
       ),
     );

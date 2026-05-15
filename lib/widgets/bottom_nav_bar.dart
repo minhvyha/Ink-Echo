@@ -30,8 +30,8 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: Icons.menu_book_outlined,
-            label: 'Vault',
+            icon: Icons.home_outlined,
+            label: 'Home',
             selected: currentIndex == 0,
             onTap: () => onChanged(0),
           ),
@@ -40,10 +40,10 @@ class AppBottomNavBar extends StatelessWidget {
             onTap: () => onChanged(1),
           ),
           _NavItem(
-            icon: Icons.settings_outlined,
-            label: 'Settings',
-            selected: currentIndex == 1,
-            onTap: () => onChanged(1),
+            icon: Icons.menu_book_outlined,
+            label: 'Vault',
+            selected: currentIndex == 2,
+            onTap: () => onChanged(2),
           ),
         ],
       ),

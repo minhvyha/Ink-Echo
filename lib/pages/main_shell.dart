@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
+import 'home_page.dart';
 import 'vault_page.dart';
 import 'reflection_page.dart';
 
@@ -18,9 +19,10 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _index = 0;
 
-  final _pages = const [
-    VaultPage(),
-    ReflectionPage(),
+  late final List<Widget> _pages = [
+    const HomePage(),
+    ReflectionPage(onBookSaved: () => setState(() => _index = 0)),
+    const VaultPage(),
   ];
 
   @override
