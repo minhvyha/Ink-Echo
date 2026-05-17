@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/theme/ink_echo_palette.dart';
+import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
 
 class BookJournalCard extends StatelessWidget {
@@ -17,9 +19,9 @@ class BookJournalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = paletteForBook(book.id);
-    final bg = Color(palette.$1);
-    final accent = Color(palette.$2);
+    final palette = bookCardPalette(book.id, Theme.of(context).brightness);
+    final bg = palette.$1;
+    final accent = palette.$2;
     final quote = book.echo.trim().isEmpty
         ? (book.transcription?.trim().isNotEmpty == true
             ? book.transcription!
@@ -40,7 +42,7 @@ class BookJournalCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: Theme.of(context).shadowColor.withValues(alpha: 0.08),
                   blurRadius: 14,
                   offset: const Offset(0, 8),
                 ),
@@ -89,10 +91,10 @@ class BookJournalCard extends StatelessWidget {
                   ),
                   if (book.transcription != null &&
                       book.transcription!.isNotEmpty)
-                    const Positioned(
+                    Positioned(
                       top: 18,
                       right: 18,
-                      child: Icon(Icons.mic, size: 18, color: Color(0xFF5A544E)),
+                      child: Icon(Icons.mic, size: 18, color: context.inkMuted),
                     ),
                   Positioned(
                     left: 12,
@@ -101,17 +103,17 @@ class BookJournalCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.42),
+                        color: context.inkPalette.quoteOverlay,
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: Text(
                         '“$quote”',
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 12,
                           fontStyle: FontStyle.italic,
-                          color: Color(0xFF4D433D),
+                          color: context.inkPrimaryText,
                         ),
                       ),
                     ),
@@ -125,18 +127,18 @@ class BookJournalCard extends StatelessWidget {
             book.title.isEmpty ? 'Untitled' : book.title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF47413C),
+              color: context.inkPrimaryText,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             meta,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: Color(0xFF8D847B),
+              color: context.inkMuted,
             ),
           ),
         ],

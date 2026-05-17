@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/theme/ink_echo_palette.dart';
+import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/pages/book_detail_page.dart';
 import 'package:inkandecho/pages/reflection_page.dart';
 import 'package:inkandecho/services/book_service.dart';
@@ -48,8 +50,8 @@ class VaultPage extends StatelessWidget {
                 children: [
                   const AppHeader(showSearch: true),
                   const SizedBox(height: 8),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 22),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -58,16 +60,16 @@ class VaultPage extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 12,
                             letterSpacing: 1.5,
-                            color: Color(0xFF8F877D),
+                            color: context.inkMuted,
                           ),
                         ),
-                        SizedBox(height: 6),
+                        const SizedBox(height: 6),
                         Text(
                           'The Vault',
                           style: TextStyle(
                             fontSize: 40,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF46413C),
+                            color: context.inkPrimaryText,
                             fontFamily: 'serif',
                           ),
                         ),
@@ -81,21 +83,21 @@ class VaultPage extends StatelessWidget {
                       children: [
                         Expanded(
                           child: _StatCard(
-                            background: const Color(0xFFF7F2E7),
+                            background: context.inkPalette.statCream,
                             icon: Icons.menu_book_outlined,
                             title: loading ? '—' : '${books.length}',
                             subtitle: 'ENTRIES COLLECTED',
-                            iconColor: const Color(0xFF007D64),
+                            iconColor: context.inkPrimary,
                           ),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: _StatCard(
-                            background: Color(0xFFF9D5C9),
+                            background: context.inkPalette.statPeach,
                             icon: Icons.calendar_month_outlined,
                             title: '—',
                             subtitle: 'DAILY STREAK',
-                            iconColor: Color(0xFF9C5D49),
+                            iconColor: context.inkPalette.actionPeachIcon,
                             compact: true,
                           ),
                         ),
@@ -104,11 +106,11 @@ class VaultPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
                   if (loading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 48),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 48),
                       child: Center(
                         child: CircularProgressIndicator(
-                          color: Color(0xFF007352),
+                          color: context.inkPrimary,
                         ),
                       ),
                     )
@@ -118,33 +120,33 @@ class VaultPage extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F2EC),
+                          color: context.inkPalette.emptyNotice,
                           borderRadius: BorderRadius.circular(28),
                         ),
                         child: Column(
                           children: [
-                            const Icon(
+                            Icon(
                               Icons.library_books_outlined,
                               size: 40,
-                              color: Color(0xFF5A6B62),
+                              color: context.inkMuted,
                             ),
                             const SizedBox(height: 12),
-                            const Text(
+                            Text(
                               'Your vault is empty',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
-                                color: Color(0xFF5A6B62),
+                                color: context.inkPrimaryText,
                               ),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
+                            Text(
                               'Tap + to add your first book with photos, echoes, and voice notes.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 15,
                                 height: 1.45,
-                                color: Color(0xFF5A6B62),
+                                color: context.inkMuted,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -152,9 +154,6 @@ class VaultPage extends StatelessWidget {
                               onPressed: () => _openAdd(context),
                               icon: const Icon(Icons.add),
                               label: const Text('Add entry'),
-                              style: FilledButton.styleFrom(
-                                backgroundColor: const Color(0xFF007352),
-                              ),
                             ),
                           ],
                         ),
@@ -192,7 +191,7 @@ class VaultPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openAdd(context),
-        backgroundColor: const Color(0xFF26B58C),
+        backgroundColor: context.inkAccent,
         child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
@@ -233,7 +232,7 @@ class _StatCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.5),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: compact ? 26 : 30),
@@ -243,19 +242,19 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF4C4540),
+                  color: context.inkPrimaryText,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   letterSpacing: 0.8,
-                  color: Color(0xFF6D645C),
+                  color: context.inkMuted,
                 ),
               ),
             ],

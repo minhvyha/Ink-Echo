@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../theme/ink_echo_palette.dart';
+import '../theme/ink_echo_theme.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -16,11 +18,11 @@ class AppBottomNavBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.98),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.07),
+            color: Theme.of(context).shadowColor.withValues(alpha: 0.12),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -66,8 +68,9 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        selected ? const Color(0xFF2BBF9B) : const Color(0xFF9E9E9E);
+    final color = selected
+        ? context.inkAccent
+        : context.inkPalette.navUnselected;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -80,7 +83,7 @@ class _NavItem extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               decoration: selected
                   ? BoxDecoration(
-                      color: const Color(0xFF2BBF9B).withValues(alpha: 0.15),
+                      color: context.inkAccent.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     )
                   : null,

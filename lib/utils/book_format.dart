@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
 
 String formatBookDate(DateTime? date) {
@@ -19,15 +20,20 @@ String estimateReadLabel(Book book) {
   return '$minutes min read';
 }
 
-(int bg, int accent) paletteForBook(String id) {
+(Color bg, Color accent) bookCardPalette(String id, Brightness brightness) {
   final palettes = [
-    (0xFFF0EBDD, 0xFFB5E5E0),
-    (0xFFDFF2D7, 0xFF355745),
-    (0xFFF3D5A8, 0xFFC88D52),
-    (0xFFDCEFF7, 0xFF7CD6E6),
-    (0xFFF7E8E0, 0xFFE8A598),
-    (0xFFE8E0F7, 0xFF9B8FD9),
+    (const Color(0xFFF0EBDD), const Color(0xFFB5E5E0)),
+    (const Color(0xFFDFF2D7), const Color(0xFF355745)),
+    (const Color(0xFFF3D5A8), const Color(0xFFC88D52)),
+    (const Color(0xFFDCEFF7), const Color(0xFF7CD6E6)),
+    (const Color(0xFFF7E8E0), const Color(0xFFE8A598)),
+    (const Color(0xFFE8E0F7), const Color(0xFF9B8FD9)),
   ];
   final i = id.hashCode.abs() % palettes.length;
-  return palettes[i];
+  final pair = palettes[i];
+  if (brightness == Brightness.light) return pair;
+  return (
+    Color.lerp(pair.$1, const Color(0xFF252522), 0.55)!,
+    Color.lerp(pair.$2, const Color(0xFF2BBF9B), 0.3)!,
+  );
 }

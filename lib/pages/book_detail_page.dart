@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/theme/ink_echo_palette.dart';
+import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
 
 class BookDetailPage extends StatelessWidget {
@@ -16,9 +18,9 @@ class BookDetailPage extends StatelessWidget {
     final hasEcho = book.echo.trim().isNotEmpty;
     final hasTranscription =
         book.transcription != null && book.transcription!.trim().isNotEmpty;
+    final palette = context.inkPalette;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFfffbff),
       body: SafeArea(
         child: Column(
           children: [
@@ -27,15 +29,15 @@ class BookDetailPage extends StatelessWidget {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color(0xFF4A4742)),
+                    icon: Icon(Icons.arrow_back, color: context.inkPrimaryText),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Ink & Echo',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Color(0xFF2BBF9B),
+                        color: context.inkAccent,
                         fontSize: 22,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w500,
@@ -59,16 +61,16 @@ class BookDetailPage extends StatelessWidget {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF0EBDD),
+                          color: context.inkSurface,
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Text(
                           book.mood!.toUpperCase(),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             letterSpacing: 1.2,
-                            color: Color(0xFF6D645C),
+                            color: context.inkMuted,
                           ),
                         ),
                       ),
@@ -76,10 +78,10 @@ class BookDetailPage extends StatelessWidget {
                       const SizedBox(height: 14),
                     Text(
                       book.title.isEmpty ? 'Untitled' : book.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 34,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF39382F),
+                        color: context.inkPrimaryText,
                         fontFamily: 'serif',
                         height: 1.15,
                       ),
@@ -87,20 +89,16 @@ class BookDetailPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        const Icon(
-                          Icons.person_outline,
-                          size: 20,
-                          color: Color(0xFF8F877D),
-                        ),
+                        Icon(Icons.person_outline, size: 20, color: context.inkMuted),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             book.author.isEmpty
                                 ? 'Unknown author'
                                 : book.author,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
-                              color: Color(0xFF66655A),
+                              color: context.inkMuted,
                             ),
                           ),
                         ),
@@ -116,13 +114,13 @@ class BookDetailPage extends StatelessWidget {
                       const SizedBox(height: 18),
                     ],
                     if (coverBytes != null) ...[
-                      const Text(
+                      Text(
                         'COVER',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 1.3,
-                          color: Color(0xFFA39A8F),
+                          color: context.inkMuted,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -153,13 +151,13 @@ class BookDetailPage extends StatelessWidget {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F2EC),
+                          color: palette.emptyNotice,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
+                        child: Text(
                           'No reflections or media were added for this entry.',
                           style: TextStyle(
-                            color: Color(0xFF5A6B62),
+                            color: context.inkMuted,
                             height: 1.45,
                           ),
                         ),
@@ -197,30 +195,30 @@ class _QuoteCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7F2E7),
+        color: context.inkSurface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0xFFE7E0D1)),
+        border: Border.all(color: context.inkPalette.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'THE ECHO',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
-              color: Color(0xFFA39A8F),
+              color: context.inkMuted,
             ),
           ),
           const SizedBox(height: 12),
           Text(
             '“$text”',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 20,
               height: 1.45,
               fontStyle: FontStyle.italic,
-              color: Color(0xFF39382F),
+              color: context.inkPrimaryText,
               fontFamily: 'serif',
             ),
           ),
@@ -237,13 +235,14 @@ class _TranscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.inkPalette;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDEAE4),
+        color: palette.transcriptionCard,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE7C3B9)),
+        border: Border.all(color: palette.transcriptionBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,21 +252,21 @@ class _TranscriptionCard extends StatelessWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF4C7B6),
+                decoration: BoxDecoration(
+                  color: palette.actionPeachBorder,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.mic, color: Color(0xFF8B4D3B)),
+                child: Icon(Icons.mic, color: palette.actionPeachIcon),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'VOICE TRANSCRIPTION',
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1,
-                    color: Color(0xFF8B4D3B),
+                    color: palette.actionPeachIcon,
                   ),
                 ),
               ),
@@ -276,10 +275,10 @@ class _TranscriptionCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 16,
               height: 1.5,
-              color: Color(0xFF4D433D),
+              color: context.inkPrimaryText,
             ),
           ),
         ],
@@ -300,17 +299,17 @@ class _MetaRow extends StatelessWidget {
       children: [
         Text(
           '$label: ',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF8D847B),
+            color: context.inkMuted,
           ),
         ),
         Text(
           value,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            color: Color(0xFF47413C),
+            color: context.inkPrimaryText,
           ),
         ),
       ],

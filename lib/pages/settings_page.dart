@@ -113,7 +113,10 @@ class SettingsPage extends StatelessWidget {
                       ),
                     ),
                     subtitle: Text(
-                      'Signed in with Google',
+                      user?.providerData.isNotEmpty == true &&
+                              user!.providerData.first.providerId == 'google.com'
+                          ? 'Signed in with Google'
+                          : 'Signed in with email',
                       style: TextStyle(color: context.inkMuted),
                     ),
                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'ink_echo_palette.dart';
 
 class InkEchoTheme {
   static const _seed = Color(0xFF007352);
@@ -58,6 +59,23 @@ class InkEchoTheme {
         ),
       ),
       textTheme: _textTheme(Brightness.light, highContrast),
+      extensions: const [InkEchoPalette.light],
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: InkEchoPalette.light.inputFill,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(color: _seed, width: 1.2),
+        ),
+      ),
     );
   }
 
@@ -108,6 +126,24 @@ class InkEchoTheme {
         ),
       ),
       textTheme: _textTheme(Brightness.dark, highContrast),
+      extensions: const [InkEchoPalette.dark],
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: InkEchoPalette.dark.inputFill,
+        hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: BorderSide(color: _accent, width: 1.2),
+        ),
+      ),
     );
   }
 
@@ -125,10 +161,12 @@ class InkEchoTheme {
 
 /// Semantic surface colors used outside ThemeData (cards, headers).
 extension InkEchoColors on BuildContext {
+  Color get inkBackground => Theme.of(this).scaffoldBackgroundColor;
   Color get inkSurface => Theme.of(this).cardColor;
   Color get inkMuted => Theme.of(this).colorScheme.onSurface.withValues(
         alpha: Theme.of(this).brightness == Brightness.light ? 0.55 : 0.65,
       );
   Color get inkPrimaryText => Theme.of(this).colorScheme.onSurface;
   Color get inkAccent => Theme.of(this).colorScheme.secondary;
+  Color get inkPrimary => Theme.of(this).colorScheme.primary;
 }
