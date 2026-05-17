@@ -9,6 +9,8 @@ import '../widgets/common_buttons.dart';
 import '../services/book_service.dart';
 import '../utils/image_base64_encoder.dart';
 import '../utils/media_permissions.dart';
+import '../theme/ink_echo_palette.dart';
+import '../theme/ink_echo_theme.dart';
 
 class ReflectionPage extends StatefulWidget {
   final VoidCallback? onBookSaved;
@@ -125,7 +127,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
   void _showPhotoOptions() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFFfffbff),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -294,6 +296,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
   @override
   Widget build(BuildContext context) {
     final coverBytes = _coverPreviewBytes;
+    final palette = context.inkPalette;
 
     return Scaffold(
       body: SafeArea(
@@ -306,8 +309,8 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 onClose: () => Navigator.of(context).maybePop(),
               ),
           const SizedBox(height: 6),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 22),
             child: Column(
               children: [
                 Text(
@@ -315,16 +318,16 @@ class _ReflectionPageState extends State<ReflectionPage> {
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF46413C),
+                    color: context.inkPrimaryText,
                     fontFamily: 'serif',
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
-                  'Save a volume to your shelf — it will appear on Home.',
+                  'Save a volume to your shelf — it will appear in the Vault.',
                   style: TextStyle(
                     fontSize: 15,
-                    color: Color(0xFF7E756D),
+                    color: context.inkMuted,
                   ),
                 ),
               ],
@@ -340,10 +343,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
                     label: 'SNAP A PHOTO',
                     subtitle: _photoSubtitle,
                     icon: Icons.camera_alt_outlined,
-                    background: const Color(0xFFD8FAEF),
-                    borderColor: const Color(0xFF9FDCC8),
-                    iconBackground: const Color(0xFF8CEFD1),
-                    textColor: const Color(0xFF0F6A57),
+                    background: palette.actionGreenBg,
+                    borderColor: palette.actionGreenBorder,
+                    iconBackground: palette.actionGreenBorder,
+                    textColor: palette.actionGreenIcon,
                     active: _coverImageBase64 != null,
                     onTap: () => _pickImage(ImageSource.camera),
                   ),
@@ -354,10 +357,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
                     label: 'RECORD A THOUGHT',
                     subtitle: _voiceSubtitle,
                     icon: _isListening ? Icons.stop_rounded : Icons.mic_none,
-                    background: const Color(0xFFFDEAE4),
-                    borderColor: const Color(0xFFE7C3B9),
-                    iconBackground: const Color(0xFFF4C7B6),
-                    textColor: const Color(0xFF8B4D3B),
+                    background: palette.actionPeachBg,
+                    borderColor: palette.actionPeachBorder,
+                    iconBackground: palette.actionPeachBorder,
+                    textColor: palette.actionPeachIcon,
                     active: _isListening || _transcription != null,
                     onTap: _toggleListening,
                   ),
@@ -387,32 +390,31 @@ class _ReflectionPageState extends State<ReflectionPage> {
               controller: _echo,
               minLines: 4,
               maxLines: 8,
-              style: const TextStyle(
-                color: Color(0xFF4D433D),
+              style: TextStyle(
+                color: context.inkPrimaryText,
                 fontSize: 16,
                 height: 1.4,
               ),
               decoration: InputDecoration(
                 hintText: 'Words that stayed with you…',
                 hintStyle: TextStyle(
-                  color: const Color(0xFF4D433D).withValues(alpha: 0.45),
+                  color: context.inkMuted,
                   fontSize: 18,
                   fontStyle: FontStyle.italic,
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF8F1E5),
+                fillColor: palette.inputFill,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
-                  borderSide: const BorderSide(color: Color(0xFFE7E0D1)),
+                  borderSide: BorderSide(color: palette.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
-                  borderSide: const BorderSide(color: Color(0xFFE7E0D1)),
+                  borderSide: BorderSide(color: palette.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(28),
-                  borderSide:
-                      const BorderSide(color: Color(0xFF1B9C7A), width: 1.4),
+                  borderSide: BorderSide(color: context.inkAccent, width: 1.4),
                 ),
                 contentPadding: const EdgeInsets.all(18),
               ),
@@ -445,36 +447,36 @@ class _ReflectionPageState extends State<ReflectionPage> {
               child: Container(
                 height: 250,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFD6E8DE),
+                  color: palette.coverPlaceholder,
                   borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: const Color(0xFFB1D4C2)),
+                  border: Border.all(color: palette.coverBorder),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(31),
                   child: coverBytes == null
-                      ? const Center(
+                      ? Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(
                                 Icons.add_photo_alternate_outlined,
                                 size: 40,
-                                color: Color(0xFF7C756E),
+                                color: context.inkMuted,
                               ),
-                              SizedBox(height: 10),
+                              const SizedBox(height: 10),
                               Text(
                                 'Upload Cover Art',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Color(0xFF7C756E),
+                                  color: context.inkMuted,
                                   fontSize: 18,
                                 ),
                               ),
-                              SizedBox(height: 4),
+                              const SizedBox(height: 4),
                               Text(
                                 'Stored as compressed base64 in Firestore',
                                 style: TextStyle(
-                                  color: Color(0xFF9A9289),
+                                  color: context.inkMuted,
                                   fontSize: 12,
                                 ),
                               ),
@@ -513,11 +515,11 @@ class _ReflectionPageState extends State<ReflectionPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22),
               child: Material(
-                color: const Color(0xFFFDEAE4),
+                color: palette.transcriptionCard,
                 borderRadius: BorderRadius.circular(20),
                 child: ListTile(
                   leading:
-                      const Icon(Icons.text_fields, color: Color(0xFF8B4D3B)),
+                      Icon(Icons.text_fields, color: palette.actionPeachIcon),
                   title: const Text(
                     'Voice transcription',
                     style: TextStyle(fontWeight: FontWeight.w700),
@@ -569,23 +571,24 @@ class _BookTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.inkPalette;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
       child: TextField(
         controller: controller,
         textCapitalization: TextCapitalization.sentences,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
-          color: Color(0xFF4D433D),
+          color: context.inkPrimaryText,
         ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
+          hintStyle: TextStyle(
             fontSize: 15,
-            color: Color(0xFFC0B5A5),
+            color: context.inkMuted,
           ),
           filled: true,
-          fillColor: const Color(0xFFF8F1E5),
+          fillColor: palette.inputFill,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
             borderSide: BorderSide.none,
@@ -596,11 +599,11 @@ class _BookTextField extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide: const BorderSide(color: Color(0xFF1B9C7A), width: 1.2),
+            borderSide: BorderSide(color: context.inkAccent, width: 1.2),
           ),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-          suffixIcon: Icon(icon, color: const Color(0xFFBFB4A6), size: 22),
+          suffixIcon: Icon(icon, color: context.inkMuted, size: 22),
         ),
       ),
     );
@@ -617,11 +620,11 @@ class _FieldLabel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 10),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.3,
-          color: Color(0xFFA39A8F),
+          color: context.inkMuted,
         ),
       ),
     );
@@ -649,16 +652,20 @@ class _MoodChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF85EFC1) : const Color(0xFFF0EBDD),
+            color: selected
+                ? context.inkAccent.withValues(alpha: 0.35)
+                : context.inkSurface,
             borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? context.inkAccent : context.inkPalette.border,
+            ),
           ),
           child: Text(
             text,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color:
-                  selected ? const Color(0xFF0D5C4A) : const Color(0xFF5A544E),
+              color: selected ? context.inkPrimary : context.inkPrimaryText,
             ),
           ),
         ),

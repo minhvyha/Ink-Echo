@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:inkandecho/services/auth_service.dart';
+import 'package:inkandecho/theme/ink_echo_palette.dart';
+import 'package:inkandecho/theme/ink_echo_theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -100,8 +102,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.inkPalette;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFfffbff),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -110,13 +113,13 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.symmetric(vertical: 24),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.menu_book, color: Color(0xFF3EB489), size: 28),
+                  children: [
+                    Icon(Icons.menu_book, color: context.inkAccent, size: 28),
                     SizedBox(width: 8),
                     Text(
                       'Ink & Echo',
                       style: TextStyle(
-                        color: Color(0xFF3EB489),
+                        color: context.inkAccent,
                         fontSize: 24,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w600,
@@ -131,27 +134,27 @@ class _LoginPageState extends State<LoginPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      _HeroBanner(),
+                      _HeroBanner(palette: palette),
                       const SizedBox(height: 28),
-                      const Text(
+                      Text(
                         'Welcome Home',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 34,
                           fontWeight: FontWeight.w800,
-                          color: Color(0xFF39382F),
+                          color: context.inkPrimaryText,
                         ),
                       ),
                       const SizedBox(height: 12),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
                         child: Text(
                           'Sign in with email or Google to open your vault.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
                             height: 1.6,
-                            color: Color(0xFF66655A),
+                            color: context.inkMuted,
                           ),
                         ),
                       ),
@@ -183,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                             _obscurePassword
                                 ? Icons.visibility_outlined
                                 : Icons.visibility_off_outlined,
-                            color: const Color(0xFFBFB4A6),
+                            color: context.inkMuted,
                           ),
                           onPressed: () => setState(
                             () => _obscurePassword = !_obscurePassword,
@@ -204,10 +207,10 @@ class _LoginPageState extends State<LoginPage> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: _loading ? null : _resetPassword,
-                            child: const Text(
+                            child: Text(
                               'Forgot password?',
                               style: TextStyle(
-                                color: Color(0xFF007352),
+                                color: context.inkPrimary,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -221,10 +224,10 @@ class _LoginPageState extends State<LoginPage> {
                         child: ElevatedButton(
                           onPressed: _loading ? null : _submitEmail,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF007352),
+                            backgroundColor: context.inkPrimary,
                             foregroundColor: Colors.white,
                             disabledBackgroundColor:
-                                const Color(0xFF007352).withValues(alpha: 0.5),
+                                context.inkPrimary.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
                             ),
@@ -258,8 +261,8 @@ class _LoginPageState extends State<LoginPage> {
                           _isSignUp
                               ? 'Already have an account? Sign in'
                               : 'New here? Create an account',
-                          style: const TextStyle(
-                            color: Color(0xFF007352),
+                          style: TextStyle(
+                            color: context.inkPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -270,24 +273,24 @@ class _LoginPageState extends State<LoginPage> {
                           Expanded(
                             child: Container(
                               height: 1,
-                              color: const Color(0xFFE6E3D3),
+                              color: context.inkPalette.border,
                             ),
                           ),
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 14),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
                             child: Text(
                               'OR',
                               style: TextStyle(
                                 fontSize: 12,
                                 letterSpacing: 2,
-                                color: Color(0xFF66655A),
+                                color: context.inkMuted,
                               ),
                             ),
                           ),
                           Expanded(
                             child: Container(
                               height: 1,
-                              color: const Color(0xFFE6E3D3),
+                              color: context.inkPalette.border,
                             ),
                           ),
                         ],
@@ -298,21 +301,21 @@ class _LoginPageState extends State<LoginPage> {
                         height: 58,
                         child: OutlinedButton.icon(
                           onPressed: _loading ? null : _signInWithGoogle,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.g_mobiledata,
                             size: 28,
-                            color: Color(0xFF39382F),
+                            color: context.inkPrimaryText,
                           ),
-                          label: const Text(
+                          label: Text(
                             'Continue with Google',
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.w700,
-                              color: Color(0xFF39382F),
+                              color: context.inkPrimaryText,
                             ),
                           ),
                           style: OutlinedButton.styleFrom(
-                            backgroundColor: const Color(0xFFF1EEE2),
+                            backgroundColor: palette.googleButtonBg,
                             side: BorderSide.none,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(999),
@@ -321,15 +324,15 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 26),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
                           'By entering the sanctuary, you agree to our Terms of Ink and Privacy Echoes.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 11,
                             height: 1.5,
-                            color: Color(0xFF66655A),
+                            color: context.inkMuted,
                           ),
                         ),
                       ),
@@ -347,6 +350,10 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class _HeroBanner extends StatelessWidget {
+  final InkEchoPalette palette;
+
+  const _HeroBanner({required this.palette});
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -356,13 +363,13 @@ class _HeroBanner extends StatelessWidget {
           height: 280,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFFF7F3EA),
+            color: palette.statCream,
             borderRadius: BorderRadius.circular(24),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color.fromARGB(15, 57, 56, 47),
+                color: Theme.of(context).shadowColor.withValues(alpha: 0.12),
                 blurRadius: 32,
-                offset: Offset(0, 24),
+                offset: const Offset(0, 24),
               ),
             ],
             image: const DecorationImage(
@@ -381,11 +388,11 @@ class _HeroBanner extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFFfffbff).withValues(alpha: 0.45),
+              color: context.inkPalette.quoteOverlay,
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
+              border: Border.all(color: context.inkPalette.border),
             ),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
@@ -394,17 +401,17 @@ class _HeroBanner extends StatelessWidget {
                     fontSize: 18,
                     height: 1.5,
                     fontStyle: FontStyle.italic,
-                    color: Color(0xFF39382F),
+                    color: context.inkPrimaryText,
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Text(
                   'CICERO',
                   style: TextStyle(
                     fontSize: 11,
                     letterSpacing: 2,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF66655A),
+                    color: context.inkMuted,
                   ),
                 ),
               ],
@@ -439,19 +446,20 @@ class _LoginTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.inkPalette;
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
       autofillHints: autofillHints,
       validator: validator,
-      style: const TextStyle(color: Color(0xFF39382F)),
+      style: TextStyle(color: context.inkPrimaryText),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFFC0B5A5)),
+        hintStyle: TextStyle(color: context.inkMuted),
         filled: true,
-        fillColor: const Color(0xFFF8F1E5),
-        prefixIcon: Icon(icon, color: const Color(0xFFBFB4A6)),
+        fillColor: palette.inputFill,
+        prefixIcon: Icon(icon, color: context.inkMuted),
         suffixIcon: suffix,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
@@ -463,11 +471,11 @@ class _LoginTextField extends StatelessWidget {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Color(0xFF007352), width: 1.2),
+          borderSide: BorderSide(color: context.inkPrimary, width: 1.2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Color(0xFF9C5D49)),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.error),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       ),
