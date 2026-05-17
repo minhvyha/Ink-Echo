@@ -4,11 +4,13 @@ import '../theme/ink_echo_theme.dart';
 class AppHeader extends StatelessWidget {
   final bool showSearch;
   final bool showClose;
+  final VoidCallback? onClose;
 
   const AppHeader({
     super.key,
     this.showSearch = false,
     this.showClose = false,
+    this.onClose,
   });
 
   @override
@@ -32,7 +34,10 @@ class AppHeader extends StatelessWidget {
           if (showSearch)
             Icon(Icons.search, color: context.inkPrimaryText, size: 26)
           else if (showClose)
-            Icon(Icons.close, color: context.inkPrimaryText, size: 26),
+            IconButton(
+              icon: Icon(Icons.close, color: context.inkPrimaryText, size: 26),
+              onPressed: onClose ?? () => Navigator.of(context).maybePop(),
+            ),
         ],
       ),
     );

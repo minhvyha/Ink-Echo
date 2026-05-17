@@ -295,11 +295,16 @@ class _ReflectionPageState extends State<ReflectionPage> {
   Widget build(BuildContext context) {
     final coverBytes = _coverPreviewBytes;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const AppHeader(showClose: true),
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppHeader(
+                showClose: true,
+                onClose: () => Navigator.of(context).maybePop(),
+              ),
           const SizedBox(height: 6),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 22),
@@ -542,8 +547,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
               onPressed: _saving ? null : _saveBook,
             ),
           ),
-          const SizedBox(height: 30),
-        ],
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
       ),
     );
   }
