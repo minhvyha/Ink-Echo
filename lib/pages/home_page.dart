@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
 import 'package:inkandecho/services/book_service.dart';
@@ -157,6 +159,54 @@ class _NoticeCard extends StatelessWidget {
   }
 }
 
+class _BookCoverThumb extends StatelessWidget {
+  final String? coverBase64;
+
+  const _BookCoverThumb({this.coverBase64});
+
+  @override
+  Widget build(BuildContext context) {
+    final decoration = BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF26B58C), Color(0xFF8BECC3)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderRadius: BorderRadius.circular(10),
+    );
+
+    final placeholder = Container(
+      width: 48,
+      height: 62,
+      decoration: decoration,
+      child: const Icon(
+        Icons.menu_book_rounded,
+        color: Colors.white,
+        size: 26,
+      ),
+    );
+
+    final b64 = coverBase64;
+    if (b64 == null || b64.isEmpty) return placeholder;
+
+    try {
+      final bytes = base64Decode(b64);
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.memory(
+          bytes,
+          width: 48,
+          height: 62,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => placeholder,
+        ),
+      );
+    } catch (_) {
+      return placeholder;
+    }
+  }
+}
+
 class _BookCard extends StatelessWidget {
   final Book book;
 
@@ -188,23 +238,7 @@ class _BookCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 62,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF26B58C), Color(0xFF8BECC3)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(
-                  Icons.menu_book_rounded,
-                  color: Colors.white,
-                  size: 26,
-                ),
-              ),
+              _BookCoverThumb(coverBase64: book.coverImageBase64),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -243,6 +277,28 @@ class _BookCard extends StatelessWidget {
                 fontStyle: FontStyle.italic,
                 color: Color(0xFF4D433D),
               ),
+            ),
+          ],
+          if (book.transcription != null && book.transcription!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.mic, size: 16, color: Color(0xFF8D847B)),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    book.transcription!,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: Color(0xFF5A544E),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
           const SizedBox(height: 10),

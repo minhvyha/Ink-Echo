@@ -1,91 +1,200 @@
 import 'package:flutter/material.dart';
-import '../widgets/app_header.dart';
+import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/pages/book_detail_page.dart';
+import 'package:inkandecho/pages/reflection_page.dart';
+import 'package:inkandecho/services/book_service.dart';
+import 'package:inkandecho/widgets/app_header.dart';
+import 'package:inkandecho/widgets/book_journal_card.dart';
 
 class VaultPage extends StatelessWidget {
   const VaultPage({super.key});
 
+  void _openAdd(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ReflectionPage(
+          onBookSaved: () => Navigator.of(context).pop(),
+        ),
+      ),
+    );
+  }
+
+  void _openDetail(BuildContext context, Book book) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => BookDetailPage(book: book),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const AppHeader(showSearch: true),
-          const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'YOUR SANCTUARY',
-                  style: TextStyle(
-                    fontSize: 12,
-                    letterSpacing: 1.5,
-                    color: Color(0xFF8F877D),
+    return Scaffold(
+      backgroundColor: const Color(0xFFfffbff),
+      body: SafeArea(
+        child: StreamBuilder<List<Book>>(
+          stream: BookService.instance.watchBooks(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            final books = snapshot.data ?? const <Book>[];
+            final loading = snapshot.connectionState == ConnectionState.waiting &&
+                !snapshot.hasData;
+
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const AppHeader(showSearch: true),
+                  const SizedBox(height: 8),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 22),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'YOUR SANCTUARY',
+                          style: TextStyle(
+                            fontSize: 12,
+                            letterSpacing: 1.5,
+                            color: Color(0xFF8F877D),
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Text(
+                          'The Vault',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF46413C),
+                            fontFamily: 'serif',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'The Vault',
-                  style: TextStyle(
-                    fontSize: 40,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF46413C),
-                    fontFamily: 'serif',
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 22),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _StatCard(
+                            background: const Color(0xFFF7F2E7),
+                            icon: Icons.menu_book_outlined,
+                            title: loading ? '—' : '${books.length}',
+                            subtitle: 'ENTRIES COLLECTED',
+                            iconColor: const Color(0xFF007D64),
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        const Expanded(
+                          child: _StatCard(
+                            background: Color(0xFFF9D5C9),
+                            icon: Icons.calendar_month_outlined,
+                            title: '—',
+                            subtitle: 'DAILY STREAK',
+                            iconColor: Color(0xFF9C5D49),
+                            compact: true,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: Row(
-              children: const [
-                Expanded(
-                  child: _StatCard(
-                    background: Color(0xFFF7F2E7),
-                    icon: Icons.menu_book_outlined,
-                    title: '42',
-                    subtitle: 'ENTRIES COLLECTED',
-                    iconColor: Color(0xFF007D64),
-                  ),
-                ),
-                SizedBox(width: 14),
-                Expanded(
-                  child: _StatCard(
-                    background: Color(0xFFF9D5C9),
-                    icon: Icons.calendar_month_outlined,
-                    title: '12',
-                    subtitle: 'DAILY STREAK',
-                    iconColor: Color(0xFF9C5D49),
-                    compact: true,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 28),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: 4,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 0.82,
+                  const SizedBox(height: 28),
+                  if (loading)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF007352),
+                        ),
+                      ),
+                    )
+                  else if (books.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8F2EC),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(
+                              Icons.library_books_outlined,
+                              size: 40,
+                              color: Color(0xFF5A6B62),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'Your vault is empty',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF5A6B62),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Tap + to add your first book with photos, echoes, and voice notes.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 15,
+                                height: 1.45,
+                                color: Color(0xFF5A6B62),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            FilledButton.icon(
+                              onPressed: () => _openAdd(context),
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add entry'),
+                              style: FilledButton.styleFrom(
+                                backgroundColor: const Color(0xFF007352),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 22),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: books.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 0.82,
+                        ),
+                        itemBuilder: (context, index) {
+                          final book = books[index];
+                          return BookJournalCard(
+                            book: book,
+                            onTap: () => _openDetail(context, book),
+                          );
+                        },
+                      ),
+                    ),
+                  const SizedBox(height: 100),
+                ],
               ),
-              itemBuilder: (context, index) {
-                return _JournalCard(index: index);
-              },
-            ),
-          ),
-          const SizedBox(height: 24),
-        ],
+            );
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openAdd(context),
+        backgroundColor: const Color(0xFF26B58C),
+        child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
     );
   }
@@ -125,7 +234,7 @@ class _StatCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: iconColor, size: compact ? 26 : 30),
@@ -154,112 +263,6 @@ class _StatCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _JournalCard extends StatelessWidget {
-  final int index;
-  const _JournalCard({required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    final palettes = [
-      (const Color(0xFFF0EBDD), const Color(0xFFB5E5E0), 'The Quiet Room', 'Oct 24 • 3 min read'),
-      (const Color(0xFFDFF2D7), const Color(0xFF355745), 'Secret Flora', 'Oct 22 • 5 min read'),
-      (const Color(0xFFF3D5A8), const Color(0xFFC88D52), 'Morning Echoes', 'Oct 19 • 2 min read'),
-      (const Color(0xFFDCEFF7), const Color(0xFF7CD6E6), 'Stellar Ink', 'Oct 15 • 8 min read'),
-    ];
-    final item = palettes[index];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          height: 200,
-          decoration: BoxDecoration(
-            color: item.$1,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 14,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                top: 18,
-                left: 18,
-                child: Container(
-                  width: 26,
-                  height: 26,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: item.$2, width: 4),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 102,
-                  height: 130,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [item.$2.withOpacity(0.22), item.$2.withOpacity(0.62)],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.42),
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                  child: const Text(
-                    '“A small quote placeholder that echoes the journal tone.”',
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                      color: Color(0xFF4D433D),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          item.$3,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF47413C),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          item.$4,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Color(0xFF8D847B),
-          ),
-        ),
-      ],
     );
   }
 }

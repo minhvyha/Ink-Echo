@@ -14,13 +14,13 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+        color: Colors.white.withValues(alpha: 0.95),
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.07),
+            color: Colors.black.withValues(alpha: 0.07),
             blurRadius: 24,
             offset: const Offset(0, 10),
           ),
@@ -30,20 +30,18 @@ class AppBottomNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: Icons.home_outlined,
-            label: 'Home',
+            icon: Icons.inventory_2_outlined,
+            selectedIcon: Icons.inventory_2,
+            label: 'Vault',
             selected: currentIndex == 0,
             onTap: () => onChanged(0),
           ),
-          _CenterAddButton(
+          _NavItem(
+            icon: Icons.settings_outlined,
+            selectedIcon: Icons.settings,
+            label: 'Settings',
             selected: currentIndex == 1,
             onTap: () => onChanged(1),
-          ),
-          _NavItem(
-            icon: Icons.menu_book_outlined,
-            label: 'Vault',
-            selected: currentIndex == 2,
-            onTap: () => onChanged(2),
           ),
         ],
       ),
@@ -53,12 +51,14 @@ class AppBottomNavBar extends StatelessWidget {
 
 class _NavItem extends StatelessWidget {
   final IconData icon;
+  final IconData selectedIcon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
   const _NavItem({
     required this.icon,
+    required this.selectedIcon,
     required this.label,
     required this.selected,
     required this.onTap,
@@ -66,16 +66,30 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? const Color(0xFF2BBF9B) : Colors.grey;
+    final color =
+        selected ? const Color(0xFF2BBF9B) : const Color(0xFF9E9E9E);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: color),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: selected
+                  ? BoxDecoration(
+                      color: const Color(0xFF2BBF9B).withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    )
+                  : null,
+              child: Icon(
+                selected ? selectedIcon : icon,
+                color: color,
+                size: 26,
+              ),
+            ),
             const SizedBox(height: 4),
             Text(
               label.toUpperCase(),
@@ -87,43 +101,6 @@ class _NavItem extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CenterAddButton extends StatelessWidget {
-  final bool selected;
-  final VoidCallback onTap;
-
-  const _CenterAddButton({required this.selected, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.translate(
-      offset: const Offset(0, -20),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: 58,
-          height: 58,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: const LinearGradient(
-              colors: [Color(0xFF26B58C), Color(0xFF8BECC3)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF26B58C).withOpacity(0.25),
-                blurRadius: 18,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: const Icon(Icons.add, color: Colors.white, size: 30),
         ),
       ),
     );

@@ -6,6 +6,8 @@ class Book {
   final String author;
   final String echo;
   final String? mood;
+  final String? coverImageBase64;
+  final String? transcription;
   final DateTime? createdAt;
 
   const Book({
@@ -14,6 +16,8 @@ class Book {
     required this.author,
     required this.echo,
     this.mood,
+    this.coverImageBase64,
+    this.transcription,
     this.createdAt,
   });
 
@@ -30,6 +34,8 @@ class Book {
       author: data['author'] as String? ?? '',
       echo: data['echo'] as String? ?? '',
       mood: data['mood'] as String?,
+      coverImageBase64: data['coverImageBase64'] as String?,
+      transcription: data['transcription'] as String?,
       createdAt: created,
     );
   }
@@ -40,6 +46,10 @@ class Book {
       'author': author,
       'echo': echo,
       if (mood != null && mood!.isNotEmpty) 'mood': mood,
+      if (coverImageBase64 != null && coverImageBase64!.isNotEmpty)
+        'coverImageBase64': coverImageBase64,
+      if (transcription != null && transcription!.isNotEmpty)
+        'transcription': transcription,
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
