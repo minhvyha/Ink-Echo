@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
-import 'home_page.dart';
 import 'vault_page.dart';
-import 'reflection_page.dart';
+import 'settings_page.dart';
 
 class MainShell extends StatefulWidget {
   final VoidCallback onLogout;
@@ -19,24 +18,19 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _index = 0;
 
-  late final List<Widget> _pages = [
-    const HomePage(),
-    ReflectionPage(onBookSaved: () => setState(() => _index = 0)),
-    const VaultPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(child: _pages[_index]),
+      body: IndexedStack(
+        index: _index,
+        children: [
+          const VaultPage(),
+          SettingsPage(onLogout: widget.onLogout),
+        ],
+      ),
       bottomNavigationBar: AppBottomNavBar(
         currentIndex: _index,
         onChanged: (index) => setState(() => _index = index),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: widget.onLogout,
-        backgroundColor: const Color(0xFF007352),
-        child: const Icon(Icons.logout, color: Colors.white),
       ),
     );
   }

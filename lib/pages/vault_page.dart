@@ -30,7 +30,6 @@ class VaultPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFfffbff),
       body: SafeArea(
         child: StreamBuilder<List<Book>>(
           stream: BookService.instance.watchBooks(),

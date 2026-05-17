@@ -2,8 +2,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
+import 'services/accessibility_settings.dart';
 import 'services/auth_gate.dart';
 import 'services/auth_service.dart';
+import 'theme/ink_echo_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +14,7 @@ Future<void> main() async {
   );
 
   await AuthService.instance.init();
+  await AccessibilitySettings.instance.load();
 
   runApp(const MyApp());
 }
@@ -21,9 +24,30 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AuthGate(),
+    return ListenableBuilder(
+      listenable: AccessibilitySettings.instance,
+      builder: (context, _) {
+        final a11y = AccessibilitySettings.instance;
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Ink & Echo',
+          theme: InkEchoTheme.light(highContrast: a11y.highContrast),
+          darkTheme: InkEchoTheme.dark(highContrast: a11y.highContrast),
+          themeMode: a11y.darkMode ? ThemeMode.dark : ThemeMode.light,
+          builder: (context, child) {
+            final media = MediaQuery.of(context);
+            return MediaQuery(
+              data: media.copyWith(
+                textScaler: TextScaler.linear(a11y.textScale),
+                boldText: a11y.boldText,
+                disableAnimations: a11y.reduceMotion,
+              ),
+              child: child ?? const SizedBox.shrink(),
+            );
+          },
+          home: const AuthGate(),
+        );
+      },
     );
   }
 }

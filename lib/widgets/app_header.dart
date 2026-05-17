@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/ink_echo_theme.dart';
 
 class AppHeader extends StatelessWidget {
   final bool showSearch;
@@ -16,12 +17,12 @@ class AppHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
         children: [
-          const Icon(Icons.menu_book, color: Color(0xFF2BBF9B), size: 28),
+          Icon(Icons.menu_book, color: context.inkAccent, size: 28),
           const SizedBox(width: 8),
-          const Text(
+          Text(
             'Ink & Echo',
             style: TextStyle(
-              color: Color(0xFF2BBF9B),
+              color: context.inkAccent,
               fontSize: 24,
               fontStyle: FontStyle.italic,
               fontWeight: FontWeight.w500,
@@ -29,9 +30,9 @@ class AppHeader extends StatelessWidget {
           ),
           const Spacer(),
           if (showSearch)
-            const Icon(Icons.search, color: Color(0xFF4A4742), size: 26)
+            Icon(Icons.search, color: context.inkPrimaryText, size: 26)
           else if (showClose)
-            const Icon(Icons.close, color: Color(0xFF4A4742), size: 26),
+            Icon(Icons.close, color: context.inkPrimaryText, size: 26),
         ],
       ),
     );
