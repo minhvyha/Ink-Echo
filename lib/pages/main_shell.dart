@@ -24,7 +24,7 @@ class _MainShellState extends State<MainShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          const VaultPage(),
+          VaultPage(onOpenSettings: () => setState(() => _index = 1)),
           SettingsPage(onLogout: widget.onLogout),
         ],
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/ink_echo_theme.dart';
+import 'ink_echo_brand.dart';
 
 class AppHeader extends StatelessWidget {
   final bool showSearch;
@@ -15,28 +15,25 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
-          Icon(Icons.menu_book, color: context.inkAccent, size: 28),
-          const SizedBox(width: 8),
-          Text(
-            'Ink & Echo',
-            style: TextStyle(
-              color: context.inkAccent,
-              fontSize: 24,
-              fontStyle: FontStyle.italic,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          const InkEchoBrand(),
           const Spacer(),
           if (showSearch)
-            Icon(Icons.search, color: context.inkPrimaryText, size: 26)
+            IconButton(
+              onPressed: () {},
+              icon: Icon(Icons.search, color: scheme.onSurfaceVariant),
+              style: IconButton.styleFrom(shape: const CircleBorder()),
+            )
           else if (showClose)
             IconButton(
-              icon: Icon(Icons.close, color: context.inkPrimaryText, size: 26),
+              icon: Icon(Icons.close, color: scheme.onSurfaceVariant),
               onPressed: onClose ?? () => Navigator.of(context).maybePop(),
+              style: IconButton.styleFrom(shape: const CircleBorder()),
             ),
         ],
       ),
