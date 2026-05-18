@@ -9,20 +9,24 @@ class InkEchoBrand extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.menu_book_rounded,
-          color: scheme.primary,
-          size: 28,
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'Ink & Echo',
-          style: context.vaultDisplayMd.copyWith(fontSize: 24),
-        ),
-      ],
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.menu_book_rounded,
+            color: scheme.primary,
+            size: 28,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            'Ink & Echo',
+            style: context.vaultDisplayMd.copyWith(fontSize: 24),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,53 +1,211 @@
-## The App Idea: "Ink & Echo"
+# Ink & Echo
+
 **Tagline:** Your personal archive for the words that move you.
 
-### 1. The Concept
-**Ink & Echo** is a private digital scrapbooking app for readers. Instead of just tracking *what* you read (like Goodreads), it focuses on *how* you experienced the book. Users can save specific quotes, record their vocal reactions to a plot twist, and capture photos of beautiful cover art or annotated pages.
+---
 
-### 2. Alignment with Assignment Requirements
+## What is Ink & Echo?
 
-| Requirement | Implementation in "Ink & Echo" |
+**Ink & Echo** is a Flutter mobile app for readers who want to remember *how* a book felt—not only *that* they read it. Many apps track titles and star ratings; Ink & Echo is a private journal for reflections, moods, cover photos, and spoken thoughts tied to each volume on your shelf.
+
+After signing in, you build a personal **Vault** of book entries stored in the cloud. Each entry can include title and author, a written “echo” (your reflection or a favourite quote), an optional mood, a compressed cover photo, and a voice note saved as text via on-device speech recognition. The experience is calm and bookish—warm surfaces, Playfair Display headings, and a bento-style vault layout—so capturing a reading moment feels intentional rather than like filling in a spreadsheet.
+
+---
+
+## Main features
+
+### Authentication & private data
+- **Email/password** sign-in and sign-up, plus **Google** sign-in (platform-dependent).
+- **Forgot password** flow via Firebase Auth.
+- Each user’s data lives under their Firebase UID; there is no public feed or multi-user sharing.
+
+### Vault (home)
+- **Live library** of saved books from Cloud Firestore (`users/{uid}/books`).
+- **Bento layout**: featured card for the latest entry, scrollable entry cards, and a “Start a New Entry” prompt.
+- **Menu drawer**: quick links to add a reflection, open Settings, and **sort** entries (newest, oldest, title A–Z).
+- **Search**: filter entries by title, author, echo, mood, or transcription text.
+
+### Add a reflection
+- Form for **title**, **author**, **echo** (reflection/quote), and **mood** (preset chips).
+- **Photo**: camera or gallery via `image_picker`; cover is compressed and stored as **base64** in Firestore (no separate Storage bucket required).
+- **Voice**: `speech_to_text` dictation; the **transcription** is saved as text with the entry (not an audio file).
+
+### Entry detail
+- Read a full entry: cover image, echo, transcription, mood, and metadata.
+
+### Settings & accessibility
+- Account summary and **sign out**.
+- **Dark mode**, text size, bold text, high contrast, and reduce motion (persisted with `shared_preferences`).
+
+### Assignment requirements (summary)
+
+| Requirement | Implementation |
 | :--- | :--- |
-| **User Authentication** | Firebase Auth (Email/Password or Google Login). Each user has a private "Vault." |
-| **Remote Database** | Cloud Firestore to store book titles, quotes, thoughts, and metadata. |
-| **Mobile Service (Photo)** | Use the camera to take a photo of a book cover or a specific page to store with the entry. |
-| **Mobile Service (Audio)** | A "Voice Memo" feature to record a 30 second audio review or a narration of a preferred quote. |
-| **CRUD Operations** | **Create** a new "Book Entry," **Read** through a list/grid of saved books, **Update** thoughts or page numbers, and **Delete** entries no longer wanted. |
-| **No Multi-User** | The database rules will ensure users only see their own `uid` data. No public feed or "friends" list. |
+| User authentication | Firebase Auth (email/password, Google) |
+| Remote database | Cloud Firestore per-user `books` subcollection |
+| Mobile service (photo) | `image_picker` + compressed base64 cover on each entry |
+| Mobile service (voice) | `speech_to_text` → `transcription` field on each entry |
+| CRUD | **Create** and **Read** implemented; **Update** and **Delete** not yet implemented in the UI |
+| Single-user privacy | Firestore paths scoped by `uid`; no shared collections |
 
 ---
 
-### 3. README.md Structure (To help hit the 600 to 800 word goal)
+## Users & personas
 
-To ensure you get full marks for documentation, I suggest organizing your README like this:
+Ink & Echo is for **individual readers** who want a private, low-pressure place to capture reading memories—not for social discovery or publisher analytics.
 
-* **Introduction:** Define the "Reader's Fatigue" problem (forgetting great quotes) and how Ink & Echo solves it.
-* **User Personas:** * *Persona A:* The "Atmospheric Reader" who likes to remember the vibe of a book.
-    * *Persona B:* The "Student Researcher" who needs to quickly snap photos of text for later reference.
-* **Features:** Detail the "Photo-to-Quote" capture and the "Voice Reflection" log.
-* **Technical Architecture:** Describe the Flutter BLoC or Provider pattern you use for state management, and how Firebase handles the image hosting (Firebase Storage).
-* **Testing Strategy:** Explain how you used `flutter_test` to ensure the CRUD logic works and how you mocked the Firebase instance.
+### Persona A — The atmospheric reader
+**Maya**, 28, reads mostly fiction on evenings and weekends. She finishes books she loves but forgets the exact lines or feelings weeks later. She uses Ink & Echo to log a mood (“Deeply Moving”), a short echo, and sometimes a cover photo so she can scroll the Vault and recall *why* a book mattered—without posting reviews publicly.
 
----
+### Persona B — The student researcher
+**Jordan**, 21, juggles course reading and personal books. They photograph cover art or jot dictated notes while commuting. They choose Ink & Echo over a generic notes app because entries are structured per book (title, author, tags) and stay synced in one private library instead of scattered folders.
 
-### 4. Implementation Tips for Success
+### Persona C — The reflective journal keeper
+**Sam**, 35, already keeps a paper journal but wants backup and search. They use **search** in the Vault to find an author or phrase, and **sort** to revisit oldest favourites. They value privacy (no followers) and accessibility options (dark mode, larger text).
 
-Since you have experience as a TA for Web Tech and work at the Drop-in Centre, you know that **Project Structure** is where students often lose marks. For this Flutter app:
-
-* **Folder Structure:** Use a feature-based or layer-based folder structure (e.g., `lib/models`, `lib/screens`, `lib/services`, `lib/widgets`).
-* **UI/UX:** Since this is for your portfolio, use a "Bookish" theme. Use warm parchment colors, elegant serif fonts (like Google Fonts' *Playfair Display*), and clean cards for the CRUD list.
-* **Testing:** * **Unit Test:** Test your `Book` model to ensure it serializes/deserializes JSON correctly.
-    * **Widget Test:** Test that the "Add Book" button actually opens the input form.
-
-
+### Why Ink & Echo over alternatives?
+| Alternative | Limitation | Ink & Echo |
+| :--- | :--- | :--- |
+| Goodreads / StoryGraph | Focus on ratings, lists, social features | Focus on personal echo, mood, and media |
+| Apple Notes / Google Keep | Unstructured, not book-centric | One card per book with consistent fields |
+| Photo gallery | Images without reading context | Cover + reflection + voice transcription together |
 
 ---
 
-### 5. Why this is "Employer Ready"
-This project demonstrates that you can:
-1.  Handle asynchronous data (Firebase).
-2.  Manage binary files (Photos/Audio).
-3.  Implement secure, private data structures.
-4.  Write clean, testable Dart code.
+## Technical details
 
-Would you like me to help you draft the **User Personas** or the **User Stories** for your README.md file to get a head start on that word count?
+### Stack
+- **Flutter** (Dart 3.11+), Material 3 theming
+- **Firebase Core**, **Firebase Auth**, **Cloud Firestore**
+- **google_sign_in**, **image_picker**, **permission_handler**, **speech_to_text**, **image** (compression), **shared_preferences**, **google_fonts**
+
+### Project structure
+
+```
+lib/
+├── main.dart                 # Firebase init, theme, AuthGate
+├── app.dart
+├── firebase_options.dart     # Generated by FlutterFire CLI
+├── models/
+│   └── book.dart
+├── pages/
+│   ├── login_page.dart
+│   ├── main_shell.dart       # Vault + Settings tabs
+│   ├── vault_page.dart
+│   ├── reflection_page.dart  # Add entry
+│   ├── book_detail_page.dart
+│   └── settings_page.dart
+├── services/
+│   ├── auth_service.dart
+│   ├── auth_gate.dart
+│   ├── book_service.dart
+│   └── accessibility_settings.dart
+├── theme/                    # Tokens, typography, light/dark themes
+├── utils/                    # Image encoding, permissions, vault filter/sort
+└── widgets/                  # Nav bar, vault cards, drawer, brand header
+```
+
+### Firestore data model
+- Path: `users/{userId}/books/{bookId}`
+- Fields: `title`, `author`, `echo`, `mood?`, `coverImageBase64?`, `transcription?`, `createdAt` (server timestamp)
+
+### Running the app
+
+1. Install [Flutter](https://docs.flutter.dev/get-started/install) and a device emulator or physical device.
+2. Create a Firebase project and enable **Authentication** (Email/Password + Google) and **Cloud Firestore**.
+3. Configure the app (if not already done):
+   ```bash
+   flutter pub get
+   dart pub global activate flutterfire_cli
+   flutterfire configure
+   ```
+4. Run:
+   ```bash
+   flutter run
+   ```
+5. **Google sign-in (required on Android emulator):**
+   - Firebase Console → **Authentication** → **Sign-in method** → enable **Google**.
+   - Project settings → your **Android** app → add debug **SHA-1**:
+     ```bash
+     keytool -list -v -alias androiddebugkey -keystore ~/.android/debug.keystore -storepass android -keypass android
+     ```
+   - Re-download `google-services.json` into `android/app/` (it should include `oauth_client` entries).
+   - Copy the **Web client ID** (`….apps.googleusercontent.com`) into `lib/config/google_auth_config.dart` (`_defaultWebClientId`), or run with:
+     ```bash
+     flutter run --dart-define=GOOGLE_WEB_CLIENT_ID=YOUR_WEB_CLIENT_ID.apps.googleusercontent.com
+     ```
+
+### Suggested Firestore security rules
+
+Markers should confirm rules restrict access to the signed-in user:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/books/{bookId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Test account for markers
+
+> **Important:** Replace the placeholders below with a real account you create in [Firebase Console → Authentication](https://console.firebase.google.com/) before submission. Markers need working credentials to sign in without using your personal email.
+
+| Field | Value |
+| :--- | :--- |
+| **Email** | `ink.echo.marker@example.com` *(replace with your test user)* |
+| **Password** | `InkEcho2026!` *(replace; minimum 6 characters)* |
+
+**How to sign in**
+1. Open the app → use **Sign in** with the table credentials, **or**
+2. Tap **Sign up** once to register a new account (any valid email + password ≥ 6 characters). Data is isolated per account.
+
+**Google sign-in:** works on supported platforms when Google provider is enabled in Firebase; use email/password if Google is unavailable in the marking environment.
+
+### Permissions
+- **Camera / photos** — adding a cover image on the reflection screen.
+- **Microphone / speech** — voice dictation (`speech_to_text`); denied permissions show an in-app message.
+
+### Testing
+
+Run the full suite:
+
+```bash
+flutter test
+```
+
+**Unit tests** (`test/unit/`): `Book` model, `book_format`, vault filter/sort, image encoding, `AuthService` error messages, `AccessibilitySettings`, and `BookService` (with `fake_cloud_firestore` + `firebase_auth_mocks`).
+
+**Widget tests** (`test/widget/`): login validation and sign-up toggle, vault app bar search, drawer navigation/sort, bento cards, book detail, reflection form validation, main shell tab switching, settings toggles, and more. Shared helpers live in `test/helpers/test_helpers.dart`.
+
+---
+
+## Information for markers
+
+### What to evaluate
+1. **Sign-in** — email/password (and Google if configured).
+2. **Create** — menu or “Start a New Entry” → Add reflection → save with title + author; optional photo, mood, voice transcription.
+3. **Read** — entries appear in the Vault; tap for detail view.
+4. **Search & sort** — Vault app bar search; drawer sort options.
+5. **Settings** — accessibility toggles and sign out.
+6. **Privacy** — second account should not see the first account’s books (separate Firebase users).
+
+### Known limitations (honest scope)
+- **Update** and **delete** of existing Firestore entries are not implemented in the current UI (Create + Read only for CRUD marking).
+- Voice is stored as **transcription text**, not playable audio files.
+- Cover images are stored as **base64 in Firestore** (size-capped); Firebase Storage is not used.
+- `home_page.dart` is legacy/unused; the main flow is `AuthGate` → `MainShell` → `VaultPage`.
+
+### Platform notes
+- Tested target: **iOS / Android** (primary). Web may require extra Firebase/Google configuration.
+- Firebase config is in `lib/firebase_options.dart` (project-specific; do not commit private keys outside what FlutterFire generates).
+
+### Contact
+*[Add your name, student ID, and university email here before submission.]*
+
+---
+
+*Ink & Echo — built with Flutter & Firebase.*

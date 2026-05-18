@@ -1,14 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:inkandecho/models/book.dart';
 import 'package:inkandecho/utils/image_base64_encoder.dart';
 
 class BookService {
-  BookService._();
+  BookService._({
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  })  : _db = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
+
   static final BookService instance = BookService._();
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  @visibleForTesting
+  factory BookService.forTesting({
+    required FirebaseFirestore firestore,
+    required FirebaseAuth auth,
+  }) {
+    return BookService._(firestore: firestore, auth: auth);
+  }
+
+  final FirebaseFirestore _db;
+  final FirebaseAuth _auth;
 
   CollectionReference<Map<String, dynamic>>? _booksRef() {
     final uid = _auth.currentUser?.uid;

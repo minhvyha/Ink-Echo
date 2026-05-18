@@ -9,7 +9,12 @@ const int maxCoverBase64Length = 450000;
 /// Resizes and compresses [rawBytes] to JPEG, then returns base64 text.
 /// Returns null if the image cannot be shrunk enough for [maxCoverBase64Length].
 Future<String?> encodeCoverImageForFirestore(Uint8List rawBytes) async {
-  final decoded = img.decodeImage(rawBytes);
+  img.Image? decoded;
+  try {
+    decoded = img.decodeImage(rawBytes);
+  } catch (_) {
+    return null;
+  }
   if (decoded == null) return null;
 
   var width = decoded.width > 800 ? 800 : decoded.width;

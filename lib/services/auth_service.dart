@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:inkandecho/config/google_auth_config.dart';
 
 class AuthService {
   AuthService._();
@@ -13,9 +14,24 @@ class AuthService {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   Future<void> init() async {
-    await _googleSignIn.initialize(
-      clientId: kIsWeb ? 'YOUR_WEB_OAUTH_CLIENT_ID' : null,
-    );
+    final webClientId = GoogleAuthConfig.webClientId;
+
+    if (kIsWeb) {
+      await _googleSignIn.initialize(
+        clientId: webClientId.isNotEmpty ? webClientId : null,
+      );
+      return;
+    }
+
+    if (defaultTargetPlatform == TargetPlatform.android ||
+        defaultTargetPlatform == TargetPlatform.iOS) {
+      await _googleSignIn.initialize(
+        serverClientId: webClientId.isNotEmpty ? webClientId : null,
+      );
+      return;
+    }
+
+    await _googleSignIn.initialize();
   }
 
   Future<UserCredential> signInWithEmailAndPassword({
@@ -44,8 +60,15 @@ class AuthService {
 
   Future<UserCredential> signInWithGoogle() async {
     if (kIsWeb) {
+      if (!GoogleAuthConfig.isConfigured) {
+        throw StateError(_missingWebClientIdMessage);
+      }
       final provider = GoogleAuthProvider();
       return _auth.signInWithPopup(provider);
+    }
+
+    if (!GoogleAuthConfig.isConfigured) {
+      throw StateError(_missingWebClientIdMessage);
     }
 
     final googleUser = await _googleSignIn.authenticate();
@@ -58,7 +81,24 @@ class AuthService {
     return _auth.signInWithCredential(credential);
   }
 
+  static const _missingWebClientIdMessage =
+      'Google Sign-In is not configured. Add your Firebase Web Client ID in '
+      'lib/config/google_auth_config.dart (see README).';
+
   static String messageForAuthError(Object error) {
+    if (error is GoogleSignInException) {
+      switch (error.code) {
+        case GoogleSignInExceptionCode.clientConfigurationError:
+          return _missingWebClientIdMessage;
+        case GoogleSignInExceptionCode.canceled:
+          return 'Google sign-in was cancelled.';
+        default:
+          return error.description ?? 'Google sign-in failed.';
+      }
+    }
+    if (error is StateError && error.message == _missingWebClientIdMessage) {
+      return _missingWebClientIdMessage;
+    }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'invalid-email':

@@ -372,12 +372,14 @@ class _HeroBanner extends StatelessWidget {
                 offset: const Offset(0, 24),
               ),
             ],
-            image: const DecorationImage(
-              image: NetworkImage(
-                'https://lh3.googleusercontent.com/aida-public/AB6AXuCZtRjN2vfMJxIzWgteS0h1Vop90OXWs8oIt3jF3obODPKHSHKDHC1ZuMSmyjrNZad0B8vQi4NyJnhp-4O65S6lBlppft4c-Ab3mp1E1jyF4seqI_GPHJAmEneF4RzOigkkA3xA-fXUTr3flZrzdQIsDPVq2Z7SILbGnfcRcojsYS1wB1w7WGo7sCbUtkgekfJ-HEYLtcr24M80thobnc9Y9PTiXT6_rxfwkJTKLsva31rZ4IUbtSdXwkAFCA5dMas0HEjwD9tudg',
-              ),
-              fit: BoxFit.cover,
-              opacity: 0.8,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                palette.statCream,
+                palette.statCream.withValues(alpha: 0.85),
+                context.inkPrimary.withValues(alpha: 0.18),
+              ],
             ),
           ),
         ),
