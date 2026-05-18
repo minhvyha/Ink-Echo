@@ -10,6 +10,33 @@ String formatBookDate(DateTime? date) {
   return '${months[date.month - 1]} ${date.day}';
 }
 
+String formatBookDateLabel(DateTime? date) =>
+    formatBookDate(date).toUpperCase();
+
+String quoteForBook(Book book) {
+  final echo = book.echo.trim();
+  if (echo.isNotEmpty) return echo;
+  final transcription = book.transcription?.trim();
+  if (transcription != null && transcription.isNotEmpty) return transcription;
+  return 'A quiet moment waiting to be remembered.';
+}
+
+List<String> tagsForBook(Book book) {
+  final tags = <String>[];
+  if (book.mood != null && book.mood!.isNotEmpty) {
+    tags.add(book.mood!);
+  }
+  if (book.transcription != null && book.transcription!.isNotEmpty) {
+    tags.add('Voice note');
+  }
+  if (book.coverImageBase64 != null && book.coverImageBase64!.isNotEmpty) {
+    tags.add('Photo');
+  }
+  if (book.echo.isNotEmpty) tags.add('Reflections');
+  if (tags.isEmpty) tags.add('Journal');
+  return tags.take(3).toList();
+}
+
 String estimateReadLabel(Book book) {
   final words = '${book.echo} ${book.transcription ?? ''}'
       .trim()

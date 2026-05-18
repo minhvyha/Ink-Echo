@@ -1,68 +1,96 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'ink_echo_palette.dart';
+import 'ink_echo_tokens.dart';
 
 class InkEchoTheme {
-  static const _seed = Color(0xFF007352);
-  static const _accent = Color(0xFF2BBF9B);
-
   static ThemeData light({required bool highContrast}) {
-    final base = ColorScheme.fromSeed(
-      seedColor: _seed,
-      brightness: Brightness.light,
-      primary: const Color(0xFF007352),
-      secondary: _accent,
-    );
     final scheme = highContrast
-        ? base.copyWith(
+        ? InkEchoTokens.lightScheme().copyWith(
             surface: Colors.white,
             onSurface: Colors.black,
-            outline: Colors.black54,
           )
-        : base;
+        : InkEchoTokens.lightScheme();
+
+    return _buildTheme(scheme, Brightness.light, InkEchoPalette.light);
+  }
+
+  static ThemeData dark({required bool highContrast}) {
+    final scheme = highContrast
+        ? InkEchoTokens.darkScheme().copyWith(
+            surface: Colors.black,
+            onSurface: Colors.white,
+          )
+        : InkEchoTokens.darkScheme();
+
+    return _buildTheme(scheme, Brightness.dark, InkEchoPalette.dark);
+  }
+
+  static ThemeData _buildTheme(
+    ColorScheme scheme,
+    Brightness brightness,
+    InkEchoPalette palette,
+  ) {
+    final textTheme = GoogleFonts.interTextTheme(
+      brightness == Brightness.light
+          ? ThemeData.light().textTheme
+          : ThemeData.dark().textTheme,
+    ).apply(
+      bodyColor: scheme.onSurface,
+      displayColor: scheme.onSurface,
+    );
 
     return ThemeData(
       useMaterial3: true,
-      brightness: Brightness.light,
+      brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor:
-          highContrast ? Colors.white : const Color(0xFFfffbff),
-      cardColor: highContrast ? Colors.white : const Color(0xFFF7F2E7),
-      dividerColor: highContrast ? Colors.black26 : const Color(0xFFE7E0D1),
+      scaffoldBackgroundColor: scheme.surface,
+      cardColor: scheme.surfaceContainerLowest,
+      dividerColor: scheme.outlineVariant,
+      textTheme: textTheme,
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
+        backgroundColor: Colors.transparent,
         foregroundColor: scheme.onSurface,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const Color(0xFF007352);
+            return scheme.primary;
           }
           return null;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const Color(0xFF8CEFD1);
+            return scheme.primaryContainer;
           }
           return null;
         }),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: const Color(0xFF007352),
-        thumbColor: const Color(0xFF007352),
-        overlayColor: const Color(0xFF007352).withValues(alpha: 0.12),
+        activeTrackColor: scheme.primary,
+        thumbColor: scheme.primary,
+        overlayColor: scheme.primary.withValues(alpha: 0.12),
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF007352),
-          foregroundColor: Colors.white,
+          backgroundColor: scheme.primary,
+          foregroundColor: scheme.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          textStyle: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
-      textTheme: _textTheme(Brightness.light, highContrast),
-      extensions: const [InkEchoPalette.light],
+      extensions: [palette],
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: InkEchoPalette.light.inputFill,
+        fillColor: palette.inputFill,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -73,100 +101,31 @@ class InkEchoTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: _seed, width: 1.2),
+          borderSide: BorderSide(color: scheme.primary, width: 1.2),
         ),
       ),
-    );
-  }
-
-  static ThemeData dark({required bool highContrast}) {
-    final base = ColorScheme.fromSeed(
-      seedColor: _seed,
-      brightness: Brightness.dark,
-      primary: _accent,
-      surface: const Color(0xFF1E1E1C),
-    );
-    final scheme = highContrast
-        ? base.copyWith(
-            surface: Colors.black,
-            onSurface: Colors.white,
-            outline: Colors.white70,
-          )
-        : base;
-
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: scheme,
-      scaffoldBackgroundColor:
-          highContrast ? Colors.black : const Color(0xFF1A1A18),
-      cardColor: highContrast ? const Color(0xFF0D0D0D) : const Color(0xFF2A2A28),
-      dividerColor: highContrast ? Colors.white38 : const Color(0xFF3D3D3A),
-      appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
-        elevation: 0,
-      ),
-      switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((states) {
-          if (states.contains(WidgetState.selected)) {
-            return _accent;
-          }
-          return null;
-        }),
-      ),
-      sliderTheme: SliderThemeData(
-        activeTrackColor: _accent,
-        thumbColor: _accent,
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: const Color(0xFF1B9C7A),
-          foregroundColor: Colors.white,
-        ),
-      ),
-      textTheme: _textTheme(Brightness.dark, highContrast),
-      extensions: const [InkEchoPalette.dark],
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: InkEchoPalette.dark.inputFill,
-        hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide(color: _accent, width: 1.2),
-        ),
-      ),
-    );
-  }
-
-  static TextTheme _textTheme(Brightness brightness, bool highContrast) {
-    final base = brightness == Brightness.light
-        ? ThemeData.light().textTheme
-        : ThemeData.dark().textTheme;
-    if (!highContrast) return base;
-    return base.apply(
-      bodyColor: brightness == Brightness.light ? Colors.black : Colors.white,
-      displayColor: brightness == Brightness.light ? Colors.black : Colors.white,
     );
   }
 }
 
-/// Semantic surface colors used outside ThemeData (cards, headers).
 extension InkEchoColors on BuildContext {
   Color get inkBackground => Theme.of(this).scaffoldBackgroundColor;
-  Color get inkSurface => Theme.of(this).cardColor;
-  Color get inkMuted => Theme.of(this).colorScheme.onSurface.withValues(
-        alpha: Theme.of(this).brightness == Brightness.light ? 0.55 : 0.65,
-      );
+  Color get inkSurface => Theme.of(this).colorScheme.surfaceContainerLowest;
+  Color get inkMuted => Theme.of(this).colorScheme.onSurfaceVariant;
   Color get inkPrimaryText => Theme.of(this).colorScheme.onSurface;
-  Color get inkAccent => Theme.of(this).colorScheme.secondary;
+  Color get inkAccent => Theme.of(this).colorScheme.primary;
   Color get inkPrimary => Theme.of(this).colorScheme.primary;
+  Color get inkSecondary => Theme.of(this).colorScheme.secondary;
+
+  BoxDecoration get vaultCardDecoration => BoxDecoration(
+        color: Theme.of(this).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(InkEchoTokens.radiusMd),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(this).colorScheme.primary.withValues(alpha: 0.04),
+            blurRadius: 30,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      );
 }

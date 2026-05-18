@@ -1,6 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
-import '../theme/ink_echo_palette.dart';
-import '../theme/ink_echo_theme.dart';
+import '../theme/ink_echo_typography.dart';
 
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -14,51 +15,57 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.98),
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withValues(alpha: 0.12),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
+    final scheme = Theme.of(context).colorScheme;
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+          decoration: BoxDecoration(
+            color: scheme.surface.withValues(alpha: 0.9),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 30,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavItem(
-            icon: Icons.inventory_2_outlined,
-            selectedIcon: Icons.inventory_2,
-            label: 'Vault',
-            selected: currentIndex == 0,
-            onTap: () => onChanged(0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavPill(
+                icon: Icons.auto_stories_outlined,
+                selectedIcon: Icons.auto_stories,
+                label: 'Vault',
+                selected: currentIndex == 0,
+                onTap: () => onChanged(0),
+              ),
+              _NavPill(
+                icon: Icons.settings_outlined,
+                selectedIcon: Icons.settings,
+                label: 'Settings',
+                selected: currentIndex == 1,
+                onTap: () => onChanged(1),
+              ),
+            ],
           ),
-          _NavItem(
-            icon: Icons.settings_outlined,
-            selectedIcon: Icons.settings,
-            label: 'Settings',
-            selected: currentIndex == 1,
-            onTap: () => onChanged(1),
-          ),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _NavItem extends StatelessWidget {
+class _NavPill extends StatelessWidget {
   final IconData icon;
   final IconData selectedIcon;
   final String label;
   final bool selected;
   final VoidCallback onTap;
 
-  const _NavItem({
+  const _NavPill({
     required this.icon,
     required this.selectedIcon,
     required this.label,
@@ -68,42 +75,37 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected
-        ? context.inkAccent
-        : context.inkPalette.navUnselected;
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: selected
-                  ? BoxDecoration(
-                      color: context.inkAccent.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    )
-                  : null,
-              child: Icon(
-                selected ? selectedIcon : icon,
-                color: color,
-                size: 26,
+    final scheme = Theme.of(context).colorScheme;
+
+    final fg = selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
+    final bg = selected ? scheme.primaryContainer : Colors.transparent;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(selected ? selectedIcon : icon, color: fg, size: 24),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: context.vaultLabelSm.copyWith(
+                  color: fg,
+                  letterSpacing: 0.3,
+                ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label.toUpperCase(),
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: color,
-                letterSpacing: 0.7,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
