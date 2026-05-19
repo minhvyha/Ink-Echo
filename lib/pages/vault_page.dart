@@ -101,11 +101,13 @@ class _VaultPageState extends State<VaultPage> {
               !snapshot.hasData;
           final searching = _searchQuery.trim().isNotEmpty;
 
+          final topBarHeight = VaultAppBar.totalHeight(context);
+
           return Stack(
             children: [
               CustomScrollView(
                 slivers: [
-                  const SliverToBoxAdapter(child: SizedBox(height: 64)),
+                  SliverToBoxAdapter(child: SizedBox(height: topBarHeight)),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(
                       InkEchoTokens.gutter,

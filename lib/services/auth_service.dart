@@ -71,13 +71,18 @@ class AuthService {
       throw StateError(_missingWebClientIdMessage);
     }
 
-    final googleUser = await _googleSignIn.authenticate();
-    final googleAuth = googleUser.authentication;
+    // Clear any stale session so the account picker always runs cleanly.
+    await _googleSignIn.signOut();
 
-    final credential = GoogleAuthProvider.credential(
-      idToken: googleAuth.idToken,
+    final googleUser = await _googleSignIn.authenticate(
+      scopeHint: const ['email', 'profile'],
     );
+    final idToken = googleUser.authentication.idToken;
+    if (idToken == null || idToken.isEmpty) {
+      throw StateError(_googleTokenMissingMessage);
+    }
 
+    final credential = GoogleAuthProvider.credential(idToken: idToken);
     return _auth.signInWithCredential(credential);
   }
 
@@ -85,19 +90,27 @@ class AuthService {
       'Google Sign-In is not configured. Add your Firebase Web Client ID in '
       'lib/config/google_auth_config.dart (see README).';
 
+  static const _googleTokenMissingMessage =
+      'Google did not return a sign-in token. Add your debug SHA-1 in Firebase, '
+      're-download google-services.json, then run flutter clean && flutter run.';
+
   static String messageForAuthError(Object error) {
     if (error is GoogleSignInException) {
       switch (error.code) {
         case GoogleSignInExceptionCode.clientConfigurationError:
           return _missingWebClientIdMessage;
         case GoogleSignInExceptionCode.canceled:
-          return 'Google sign-in was cancelled.';
+          return _messageForCanceledGoogleSignIn(error);
         default:
           return error.description ?? 'Google sign-in failed.';
       }
     }
-    if (error is StateError && error.message == _missingWebClientIdMessage) {
-      return _missingWebClientIdMessage;
+    if (error is StateError) {
+      final message = error.message;
+      if (message == _missingWebClientIdMessage ||
+          message == _googleTokenMissingMessage) {
+        return message;
+      }
     }
     if (error is FirebaseAuthException) {
       switch (error.code) {
@@ -122,5 +135,16 @@ class AuthService {
       }
     }
     return error.toString();
+  }
+
+  static String _messageForCanceledGoogleSignIn(GoogleSignInException error) {
+    final details = (error.description ?? '').toLowerCase();
+    if (details.contains('developer') || details.contains('10')) {
+      return _googleTokenMissingMessage;
+    }
+    return 'Google sign-in did not complete. If you did not tap Cancel, check that: '
+        '(1) the emulator image includes Google Play, (2) a Google account is added '
+        'in emulator Settings, and (3) your debug SHA-1 is registered in Firebase '
+        'and google-services.json was re-downloaded.';
   }
 }

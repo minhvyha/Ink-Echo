@@ -21,7 +21,12 @@ abstract final class GoogleAuthConfig {
   );
 
   /// Paste your Web client ID here after enabling Google in Firebase.
-  static const String _defaultWebClientId = '654248867512-5c161t4nrgsed4io7n25uc8vaar6d9up.apps.googleusercontent.com';
+  static const String _defaultWebClientId =
+      '654248867512-5c161t4nrgsed4io7n25uc8vaar6d9up.apps.googleusercontent.com';
+
+  /// After setup, `android/app/google-services.json` should contain a non-empty
+  /// `oauth_client` array. If it is still `[]`, SHA-1 was not saved or you need
+  /// to re-download the file from Firebase Console.
 
   static bool get isConfigured => webClientId.trim().isNotEmpty;
 }

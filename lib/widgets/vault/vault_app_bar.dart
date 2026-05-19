@@ -5,6 +5,9 @@ import 'package:inkandecho/theme/ink_echo_typography.dart';
 import '../ink_echo_brand.dart';
 
 class VaultAppBar extends StatelessWidget {
+  /// Height of the bar content below the system status / notch inset.
+  static const double toolbarHeight = 64;
+
   final bool searchActive;
   final TextEditingController searchController;
   final FocusNode searchFocusNode;
@@ -12,6 +15,10 @@ class VaultAppBar extends StatelessWidget {
   final VoidCallback onSearchTap;
   final VoidCallback onSearchClose;
   final ValueChanged<String> onSearchChanged;
+
+  /// Total height including [MediaQuery.viewPadding] top (notch, status bar).
+  static double totalHeight(BuildContext context) =>
+      MediaQuery.viewPaddingOf(context).top + toolbarHeight;
 
   const VaultAppBar({
     super.key,
@@ -27,13 +34,14 @@ class VaultAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final topInset = MediaQuery.viewPaddingOf(context).top;
 
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          height: 64,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
+          height: topInset + toolbarHeight,
+          padding: EdgeInsets.only(top: topInset, left: 8, right: 8),
           decoration: BoxDecoration(
             color: scheme.surface.withValues(alpha: 0.82),
           ),
