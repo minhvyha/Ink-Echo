@@ -71,7 +71,6 @@ class AuthService {
       throw StateError(_missingWebClientIdMessage);
     }
 
-    // Clear any stale session so the account picker always runs cleanly.
     await _googleSignIn.signOut();
 
     final googleUser = await _googleSignIn.authenticate(

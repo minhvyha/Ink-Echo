@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Persists and broadcasts accessibility preferences app-wide.
 class AccessibilitySettings extends ChangeNotifier {
   AccessibilitySettings._();
   static final AccessibilitySettings instance = AccessibilitySettings._();

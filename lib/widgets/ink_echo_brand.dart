@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/ink_echo_typography.dart';
 
-/// Logo + wordmark used in app chrome (vault bar, reflection header, etc.).
 class InkEchoBrand extends StatelessWidget {
   const InkEchoBrand({super.key});
 

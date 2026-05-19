@@ -3,11 +3,10 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-/// Firestore documents are capped at 1 MiB. Keep base64 cover art under this.
+// Firestore doc limit is 1 MiB; keep cover base64 under this.
 const int maxCoverBase64Length = 450000;
 
-/// Resizes and compresses [rawBytes] to JPEG, then returns base64 text.
-/// Returns null if the image cannot be shrunk enough for [maxCoverBase64Length].
+// JPEG compress; returns null if still too large.
 Future<String?> encodeCoverImageForFirestore(Uint8List rawBytes) async {
   img.Image? decoded;
   try {

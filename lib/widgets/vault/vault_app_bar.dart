@@ -5,7 +5,6 @@ import 'package:inkandecho/theme/ink_echo_typography.dart';
 import '../ink_echo_brand.dart';
 
 class VaultAppBar extends StatelessWidget {
-  /// Height of the bar content below the system status / notch inset.
   static const double toolbarHeight = 64;
 
   final bool searchActive;
@@ -16,7 +15,6 @@ class VaultAppBar extends StatelessWidget {
   final VoidCallback onSearchClose;
   final ValueChanged<String> onSearchChanged;
 
-  /// Total height including [MediaQuery.viewPadding] top (notch, status bar).
   static double totalHeight(BuildContext context) =>
       MediaQuery.viewPaddingOf(context).top + toolbarHeight;
 

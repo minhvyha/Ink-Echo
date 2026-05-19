@@ -35,7 +35,6 @@ Widget wrapWithInkEchoNavigator(Widget child) {
   );
 }
 
-/// Default phone-sized surface for scrollable screens in widget tests.
 void useTallTestSurface(WidgetTester tester) {
   tester.view.physicalSize = const Size(800, 1200);
   tester.view.devicePixelRatio = 1.0;

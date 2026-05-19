@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens from the Ink & Echo library dashboard spec.
 abstract final class InkEchoTokens {
   static const primary = Color(0xFF28695C);
   static const onPrimary = Color(0xFFFFFFFF);
