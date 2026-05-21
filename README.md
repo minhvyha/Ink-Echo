@@ -32,6 +32,7 @@ After signing in, you build a personal **Vault** of book entries stored in the c
 
 ### Entry detail
 - Read a full entry: cover image, echo, transcription, mood, and metadata.
+- **Edit** reopens the reflection form with existing data; **Delete** removes the entry after confirmation.
 
 ### Settings & accessibility
 - Account summary and **sign out**.
@@ -45,7 +46,7 @@ After signing in, you build a personal **Vault** of book entries stored in the c
 | Remote database | Cloud Firestore per-user `books` subcollection |
 | Mobile service (photo) | `image_picker` + compressed base64 cover on each entry |
 | Mobile service (voice) | `speech_to_text` → `transcription` field on each entry |
-| CRUD | **Create** and **Read** implemented; **Update** and **Delete** not yet implemented in the UI |
+| CRUD | **Create**, **Read**, **Update**, and **Delete** (edit/delete on entry detail screen) |
 | Single-user privacy | Firestore paths scoped by `uid`; no shared collections |
 
 ---
@@ -156,12 +157,19 @@ service cloud.firestore {
 
 | Field | Value |
 | :--- | :--- |
-| **Email** | `ink.echo.marker@example.com` *(replace with your test user)* |
-| **Password** | `InkEcho2026!` *(replace; minimum 6 characters)* |
+| **Email** | `test@gmail.com`|
+| **Password** | `Test1234` |
 
 **How to sign in**
 1. Open the app → use **Sign in** with the table credentials, **or**
 2. Tap **Sign up** once to register a new account (any valid email + password ≥ 6 characters). Data is isolated per account.
+
+**Sample vault data** (5 demo entries + cover image search terms): see [docs/sample_vault_entries.md](docs/sample_vault_entries.md).  
+Seed the test account:
+
+```bash
+flutter run -d emulator-5554 --target tool/seed_sample_entries.dart
+```
 
 **Google sign-in:** works on supported platforms when Google provider is enabled in Firebase; use email/password if Google is unavailable in the marking environment.
 
@@ -194,7 +202,7 @@ flutter test
 6. **Privacy** — second account should not see the first account’s books (separate Firebase users).
 
 ### Known limitations (honest scope)
-- **Update** and **delete** of existing Firestore entries are not implemented in the current UI (Create + Read only for CRUD marking).
+- **Edit** opens the same form as “Add reflection”; there is no inline edit on the vault list itself.
 - Voice is stored as **transcription text**, not playable audio files.
 - Cover images are stored as **base64 in Firestore** (size-capped); Firebase Storage is not used.
 - `home_page.dart` is legacy/unused; the main flow is `AuthGate` → `MainShell` → `VaultPage`.

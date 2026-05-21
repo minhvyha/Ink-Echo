@@ -111,28 +111,47 @@ class _VaultPageState extends State<VaultPage> {
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(
                       InkEchoTokens.gutter,
-                      8,
+                      20,
                       InkEchoTokens.gutter,
                       120,
                     ),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
                         if (_searchActive && searching) ...[
-                          Text(
-                            'Results',
-                            style: context.vaultDisplayLg,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '${books.length} ${books.length == 1 ? 'entry' : 'entries'} found',
-                            style: context.vaultBodyLg,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, bottom: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Results',
+                                  style: context.vaultDisplayLg,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '${books.length} ${books.length == 1 ? 'entry' : 'entries'} found',
+                                  style: context.vaultBodyLg,
+                                ),
+                              ],
+                            ),
                           ),
                         ] else ...[
-                          Text('Your Vault', style: context.vaultDisplayLg),
-                          const SizedBox(height: 4),
-                          Text(
-                            'A quiet space for scattered thoughts.',
-                            style: context.vaultBodyLg,
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, bottom: 4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Your Vault',
+                                  style: context.vaultDisplayLg,
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'A quiet space for scattered thoughts.',
+                                  style: context.vaultBodyLg,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                         const SizedBox(height: InkEchoTokens.gap),

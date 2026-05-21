@@ -90,5 +90,65 @@ void main() {
       expect(books.first.title, 'Book A');
       expect(books.first.author, 'Author A');
     });
+
+    test('updateBook changes an existing document', () async {
+      await service.saveBook(
+        title: 'Original',
+        author: 'Author',
+        echo: 'Echo',
+        mood: 'Calm',
+      );
+
+      final id = (await firestore
+              .collection('users')
+              .doc('user-123')
+              .collection('books')
+              .get())
+          .docs
+          .first
+          .id;
+
+      await service.updateBook(
+        bookId: id,
+        title: 'Revised',
+        author: 'New Author',
+        echo: 'New echo',
+        mood: null,
+      );
+
+      final data = (await firestore
+              .collection('users')
+              .doc('user-123')
+              .collection('books')
+              .doc(id)
+              .get())
+          .data()!;
+
+      expect(data['title'], 'Revised');
+      expect(data['author'], 'New Author');
+      expect(data['echo'], 'New echo');
+      expect(data.containsKey('mood'), isFalse);
+    });
+
+    test('deleteBook removes document', () async {
+      await service.saveBook(title: 'Gone', author: 'A', echo: '');
+      final id = (await firestore
+              .collection('users')
+              .doc('user-123')
+              .collection('books')
+              .get())
+          .docs
+          .first
+          .id;
+
+      await service.deleteBook(id);
+
+      final snap = await firestore
+          .collection('users')
+          .doc('user-123')
+          .collection('books')
+          .get();
+      expect(snap.docs, isEmpty);
+    });
   });
 }

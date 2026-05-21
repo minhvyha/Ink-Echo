@@ -3,14 +3,95 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/pages/reflection_page.dart';
+import 'package:inkandecho/services/book_service.dart';
 import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
+import 'package:inkandecho/widgets/ink_echo_brand.dart';
 
-class BookDetailPage extends StatelessWidget {
+class BookDetailPage extends StatefulWidget {
   final Book book;
 
   const BookDetailPage({super.key, required this.book});
+
+  @override
+  State<BookDetailPage> createState() => _BookDetailPageState();
+}
+
+class _BookDetailPageState extends State<BookDetailPage> {
+  bool _deleting = false;
+
+  Book get book => widget.book;
+
+  Future<void> _openEdit() async {
+    final updated = await Navigator.of(context).push<bool>(
+      MaterialPageRoute<bool>(
+        builder: (ctx) => ReflectionPage(
+          book: book,
+          onBookSaved: () => Navigator.of(ctx).pop(true),
+        ),
+      ),
+    );
+    if (updated == true && mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    final scheme = Theme.of(context).colorScheme;
+    final title = book.title.isEmpty ? 'this entry' : book.title;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete entry?'),
+        content: Text(
+          'Remove "$title" from your vault? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: scheme.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _deleting = true);
+    try {
+      await BookService.instance.deleteBook(book.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Entry deleted.')),
+      );
+      Navigator.of(context).pop();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not delete: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _deleting = false);
+    }
+  }
+
+  Uint8List? _coverBytes() {
+    final b64 = book.coverImageBase64;
+    if (b64 == null || b64.isEmpty) return null;
+    try {
+      return base64Decode(b64);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,38 +100,28 @@ class BookDetailPage extends StatelessWidget {
     final hasTranscription =
         book.transcription != null && book.transcription!.trim().isNotEmpty;
     final palette = context.inkPalette;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
               child: Row(
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: context.inkPrimaryText),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: _deleting ? null : () => Navigator.of(context).pop(),
                   ),
-                  Expanded(
-                    child: Text(
-                      'Ink & Echo',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: context.inkAccent,
-                        fontSize: 22,
-                        fontStyle: FontStyle.italic,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  const Expanded(child: Center(child: InkEchoBrand())),
                   const SizedBox(width: 48),
                 ],
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(22, 8, 22, 32),
+                padding: const EdgeInsets.fromLTRB(22, 8, 22, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -163,6 +234,45 @@ class BookDetailPage extends StatelessWidget {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _deleting ? null : _openEdit,
+                            icon: const Icon(Icons.edit_outlined),
+                            label: const Text('Edit'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: scheme.primary,
+                              side: BorderSide(color: scheme.primary),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: _deleting ? null : _confirmDelete,
+                            icon: _deleting
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: scheme.onError,
+                                    ),
+                                  )
+                                : const Icon(Icons.delete_outline),
+                            label: Text(_deleting ? 'Deleting…' : 'Delete'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: scheme.error,
+                              foregroundColor: scheme.onError,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -171,16 +281,6 @@ class BookDetailPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Uint8List? _coverBytes() {
-    final b64 = book.coverImageBase64;
-    if (b64 == null || b64.isEmpty) return null;
-    try {
-      return base64Decode(b64);
-    } catch (_) {
-      return null;
-    }
   }
 }
 

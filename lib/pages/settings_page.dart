@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/accessibility_settings.dart';
 import '../theme/ink_echo_theme.dart';
-import '../widgets/app_header.dart';
+import '../widgets/ink_echo_brand.dart';
 
 class SettingsPage extends StatelessWidget {
   final VoidCallback onLogout;
@@ -22,8 +22,14 @@ class SettingsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const AppHeader(),
-              const SizedBox(height: 8),
+              SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                  child: const Center(child: InkEchoBrand()),
+                ),
+              ),
+              const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: Column(

@@ -31,6 +31,16 @@ void main() {
     expect(find.text('A remembered line'), findsOneWidget);
   });
 
+  testWidgets('shows edit and delete actions', (tester) async {
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(BookDetailPage(book: sampleBook())),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
+  });
+
   testWidgets('back button pops the route', (tester) async {
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(

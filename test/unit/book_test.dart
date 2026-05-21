@@ -70,6 +70,37 @@ void main() {
       expect(book.createdAt, created);
     });
 
+    test('fieldsForUpdate clears optional fields with FieldValue.delete', () {
+      final map = Book.fieldsForUpdate(
+        title: 'T',
+        author: 'A',
+        echo: 'E',
+        mood: '',
+        coverImageBase64: null,
+        transcription: '  ',
+      );
+
+      expect(map['title'], 'T');
+      expect(map['mood'], isA<FieldValue>());
+      expect(map['coverImageBase64'], isA<FieldValue>());
+      expect(map['transcription'], isA<FieldValue>());
+    });
+
+    test('fieldsForUpdate keeps provided optional fields', () {
+      final map = Book.fieldsForUpdate(
+        title: 'T',
+        author: 'A',
+        echo: 'E',
+        mood: 'Calm',
+        coverImageBase64: 'abc',
+        transcription: 'note',
+      );
+
+      expect(map['mood'], 'Calm');
+      expect(map['coverImageBase64'], 'abc');
+      expect(map['transcription'], 'note');
+    });
+
     test('fromDoc uses defaults for missing fields', () async {
       final firestore = FakeFirebaseFirestore();
       await firestore.collection('books').doc('empty').set({});

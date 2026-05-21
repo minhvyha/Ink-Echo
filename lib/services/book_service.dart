@@ -54,12 +54,7 @@ class BookService {
       throw StateError('No signed-in user');
     }
 
-    if (coverImageBase64 != null &&
-        coverImageBase64.length > maxCoverBase64Length) {
-      throw StateError(
-        'Cover image is too large. Please use a smaller photo.',
-      );
-    }
+    _ensureCoverSizeAllowed(coverImageBase64);
 
     final trimmedMood = mood?.trim();
     final book = Book(
@@ -75,5 +70,50 @@ class BookService {
     );
 
     await ref.add(book.toCreateMap());
+  }
+
+  Future<void> updateBook({
+    required String bookId,
+    required String title,
+    required String author,
+    required String echo,
+    String? mood,
+    String? coverImageBase64,
+    String? transcription,
+  }) async {
+    final ref = _booksRef();
+    if (ref == null) {
+      throw StateError('No signed-in user');
+    }
+
+    _ensureCoverSizeAllowed(coverImageBase64);
+
+    await ref.doc(bookId).update(
+      Book.fieldsForUpdate(
+        title: title,
+        author: author,
+        echo: echo,
+        mood: mood,
+        coverImageBase64: coverImageBase64,
+        transcription: transcription,
+      ),
+    );
+  }
+
+  Future<void> deleteBook(String bookId) async {
+    final ref = _booksRef();
+    if (ref == null) {
+      throw StateError('No signed-in user');
+    }
+    await ref.doc(bookId).delete();
+  }
+
+  void _ensureCoverSizeAllowed(String? coverImageBase64) {
+    if (coverImageBase64 != null &&
+        coverImageBase64.length > maxCoverBase64Length) {
+      throw StateError(
+        'Cover image is too large. Please use a smaller photo.',
+      );
+    }
   }
 }

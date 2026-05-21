@@ -53,4 +53,41 @@ class Book {
       'createdAt': FieldValue.serverTimestamp(),
     };
   }
+
+  static Map<String, dynamic> fieldsForUpdate({
+    required String title,
+    required String author,
+    required String echo,
+    String? mood,
+    String? coverImageBase64,
+    String? transcription,
+  }) {
+    final map = <String, dynamic>{
+      'title': title.trim(),
+      'author': author.trim(),
+      'echo': echo.trim(),
+    };
+
+    final trimmedMood = mood?.trim();
+    if (trimmedMood != null && trimmedMood.isNotEmpty) {
+      map['mood'] = trimmedMood;
+    } else {
+      map['mood'] = FieldValue.delete();
+    }
+
+    if (coverImageBase64 != null && coverImageBase64.isNotEmpty) {
+      map['coverImageBase64'] = coverImageBase64;
+    } else {
+      map['coverImageBase64'] = FieldValue.delete();
+    }
+
+    final trimmedTranscription = transcription?.trim();
+    if (trimmedTranscription != null && trimmedTranscription.isNotEmpty) {
+      map['transcription'] = trimmedTranscription;
+    } else {
+      map['transcription'] = FieldValue.delete();
+    }
+
+    return map;
+  }
 }

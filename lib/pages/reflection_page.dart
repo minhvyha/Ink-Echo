@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'package:inkandecho/models/book.dart';
 import '../widgets/app_header.dart';
 import '../widgets/common_buttons.dart';
 import '../services/book_service.dart';
@@ -13,9 +14,10 @@ import '../theme/ink_echo_palette.dart';
 import '../theme/ink_echo_theme.dart';
 
 class ReflectionPage extends StatefulWidget {
+  final Book? book;
   final VoidCallback? onBookSaved;
 
-  const ReflectionPage({super.key, this.onBookSaved});
+  const ReflectionPage({super.key, this.book, this.onBookSaved});
 
   @override
   State<ReflectionPage> createState() => _ReflectionPageState();
@@ -43,9 +45,20 @@ class _ReflectionPageState extends State<ReflectionPage> {
     'Nostalgic',
   ];
 
+  bool get _isEditing => widget.book != null;
+
   @override
   void initState() {
     super.initState();
+    final existing = widget.book;
+    if (existing != null) {
+      _title.text = existing.title;
+      _author.text = existing.author;
+      _echo.text = existing.echo;
+      _mood = existing.mood;
+      _coverImageBase64 = existing.coverImageBase64;
+      _transcription = existing.transcription;
+    }
     _initSpeech();
   }
 
@@ -256,19 +269,37 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
     setState(() => _saving = true);
     try {
-      await BookService.instance.saveBook(
-        title: title,
-        author: author,
-        echo: _echo.text.trim(),
-        mood: _mood,
-        coverImageBase64: _coverImageBase64,
-        transcription: _transcription,
-      );
+      if (_isEditing) {
+        await BookService.instance.updateBook(
+          bookId: widget.book!.id,
+          title: title,
+          author: author,
+          echo: _echo.text.trim(),
+          mood: _mood,
+          coverImageBase64: _coverImageBase64,
+          transcription: _transcription,
+        );
+      } else {
+        await BookService.instance.saveBook(
+          title: title,
+          author: author,
+          echo: _echo.text.trim(),
+          mood: _mood,
+          coverImageBase64: _coverImageBase64,
+          transcription: _transcription,
+        );
+      }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Book saved to your shelf.')),
+        SnackBar(
+          content: Text(
+            _isEditing
+                ? 'Entry updated.'
+                : 'Book saved to your shelf.',
+          ),
+        ),
       );
-      _clearForm();
+      if (!_isEditing) _clearForm();
       widget.onBookSaved?.call();
     } catch (e) {
       if (!mounted) return;
@@ -314,7 +345,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
             child: Column(
               children: [
                 Text(
-                  'Add a book',
+                  _isEditing ? 'Edit entry' : 'Add a book',
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w800,
@@ -324,7 +355,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Save a volume to your shelf — it will appear in the Vault.',
+                  _isEditing
+                      ? 'Update this volume in your vault.'
+                      : 'Save a volume to your shelf — it will appear in the Vault.',
                   style: TextStyle(
                     fontSize: 15,
                     color: context.inkMuted,
@@ -541,7 +574,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
             child: GradientButton(
-              text: _saving ? 'Saving…' : 'Save book',
+              text: _saving
+                  ? 'Saving…'
+                  : (_isEditing ? 'Save changes' : 'Save book'),
               icon: Icons.arrow_forward,
               gradient: const LinearGradient(
                 colors: [Color(0xFF1B9C7A), Color(0xFF7FECBA)],
