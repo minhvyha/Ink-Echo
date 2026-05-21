@@ -26,7 +26,9 @@ This file complements in-code `///` comments for assignment markers reviewing st
 | File | Role |
 |------|------|
 | `models/book.dart` | Domain model + Firestore serialization |
-| `services/book_service.dart` | `watchBooks`, `saveBook`, `updateBook`, `deleteBook` |
+| `services/book_service.dart` | `watchVault`, `saveBook`, `updateBook`, `deleteBook` |
+| `services/connectivity_service.dart` | Online/offline for vault banners |
+| `services/firestore_bootstrap.dart` | Enables Firestore offline cache |
 
 Firestore path: `users/{uid}/books/{bookId}`.
 

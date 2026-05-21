@@ -14,20 +14,16 @@ void main() {
       (tester) async {
     useTallTestSurface(tester);
     await tester.pumpWidget(
-      wrapWithInkEchoNavigator(const ReflectionPage()),
+      wrapWithInkEchoNavigator(const ReflectionPage(skipSpeechInit: true)),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
     expect(find.text('Add a book'), findsOneWidget);
     expect(find.text('Ink & Echo'), findsOneWidget);
 
-    await tester.scrollUntilVisible(
-      find.text('Save book'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Save book'));
     await tester.tap(find.text('Save book'));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester);
 
     expect(
       find.text('Please add a title and author before saving.'),
@@ -41,16 +37,16 @@ void main() {
         Material(
           child: Navigator(
             onGenerateRoute: (_) => MaterialPageRoute<void>(
-              builder: (_) => const ReflectionPage(),
+              builder: (_) => const ReflectionPage(skipSpeechInit: true),
             ),
           ),
         ),
       ),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
     await tester.tap(find.byIcon(Icons.close));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester);
   });
 
   testWidgets('edit mode prefills title and author fields', (tester) async {
@@ -63,9 +59,11 @@ void main() {
     );
 
     await tester.pumpWidget(
-      wrapWithInkEchoNavigator(ReflectionPage(book: book)),
+      wrapWithInkEchoNavigator(
+        ReflectionPage(book: book, skipSpeechInit: true),
+      ),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
     expect(find.text('Edit entry'), findsOneWidget);
     expect(tester.widget<TextField>(_titleField).controller?.text, 'Dune');
@@ -79,17 +77,13 @@ void main() {
   testWidgets('selecting mood chip updates selection', (tester) async {
     useTallTestSurface(tester);
     await tester.pumpWidget(
-      wrapWithInkEchoNavigator(const ReflectionPage()),
+      wrapWithInkEchoNavigator(const ReflectionPage(skipSpeechInit: true)),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
-    await tester.scrollUntilVisible(
-      find.text('Nostalgic'),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Nostalgic'));
     await tester.tap(find.text('Nostalgic'));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester);
 
     expect(find.text('Nostalgic'), findsWidgets);
   });
@@ -103,28 +97,25 @@ void main() {
       wrapWithInkEchoNavigator(
         ReflectionPage(
           bookService: service,
+          skipSpeechInit: true,
           onBookSaved: () => saved = true,
         ),
       ),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
     await tester.enterText(_titleField, 'New Title');
     await tester.enterText(_authorField, 'New Author');
 
-    await tester.scrollUntilVisible(
-      find.text('Save book'),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Save book'));
     await tester.tap(find.text('Save book'));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester, const Duration(milliseconds: 600));
 
     expect(find.text('Book saved to your shelf.'), findsOneWidget);
     expect(saved, isTrue);
 
-    final books = await service.watchBooks().first;
-    expect(books.any((b) => b.title == 'New Title'), isTrue);
+    final docs = await readTestBookDocs();
+    expect(docs.any((d) => d['title'] == 'New Title'), isTrue);
   });
 
   testWidgets('update book persists changes via injected service',
@@ -135,27 +126,31 @@ void main() {
       title: 'Original',
       echo: 'Old echo',
     );
-    final existing = (await service.watchBooks().first).first;
+    final existing = sampleBook(
+      id: 'edit-id',
+      title: 'Original',
+      echo: 'Old echo',
+    );
 
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(
-        ReflectionPage(book: existing, bookService: service),
+        ReflectionPage(
+          book: existing,
+          bookService: service,
+          skipSpeechInit: true,
+        ),
       ),
     );
-    await tester.pumpAndSettle(const Duration(seconds: 2));
+    await pumpBrief(tester, const Duration(milliseconds: 800));
 
     await tester.enterText(_titleField, 'Revised Title');
-    await tester.scrollUntilVisible(
-      find.text('Save changes'),
-      400,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await scrollTo(tester, find.text('Save changes'));
     await tester.tap(find.text('Save changes'));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester, const Duration(milliseconds: 600));
 
     expect(find.text('Entry updated.'), findsOneWidget);
 
-    final updated = (await service.watchBooks().first).first;
-    expect(updated.title, 'Revised Title');
+    final data = await readTestBookDoc('edit-id');
+    expect(data?['title'], 'Revised Title');
   });
 }

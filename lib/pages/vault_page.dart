@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/models/vault_books_state.dart';
 import 'package:inkandecho/pages/book_detail_page.dart';
 import 'package:inkandecho/pages/reflection_page.dart';
 import 'package:inkandecho/services/book_service.dart';
@@ -11,11 +12,12 @@ import 'package:inkandecho/utils/vault_book_list.dart';
 import 'package:inkandecho/widgets/vault/vault_app_bar.dart';
 import 'package:inkandecho/widgets/vault/vault_bento_cards.dart';
 import 'package:inkandecho/widgets/vault/vault_drawer.dart';
+import 'package:inkandecho/widgets/vault/vault_sync_banner.dart';
 
 /// Main library screen after sign-in ([MainShell] tab 0).
 ///
-/// Streams books via [BookService.watchBooks], supports client-side
-/// search/sort, and opens reflection/detail flows.
+/// Streams books via [BookService.watchVault], supports client-side
+/// search/sort, offline cache banners, and retry on load errors.
 class VaultPage extends StatefulWidget {
   final VoidCallback onOpenSettings;
   final BookService? bookService;
@@ -35,11 +37,22 @@ class _VaultPageState extends State<VaultPage> {
   final _searchController = TextEditingController();
   final _searchFocus = FocusNode();
 
+  late Stream<VaultBooksState> _vaultStream;
+  int _vaultGeneration = 0;
+
   /// App bar toggles between brand row and inline search field.
   bool _searchActive = false;
   String _searchQuery = '';
   /// Persisted only for this session; chosen from [VaultDrawer].
   VaultSortOrder _sortOrder = VaultSortOrder.newest;
+
+  BookService get _bookService => widget.bookService ?? BookService.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _vaultStream = _bookService.watchVault();
+  }
 
   @override
   void dispose() {
@@ -48,10 +61,20 @@ class _VaultPageState extends State<VaultPage> {
     super.dispose();
   }
 
+  Future<void> _retryVaultLoad() async {
+    await BookService.retryConnection();
+    if (!mounted) return;
+    setState(() {
+      _vaultGeneration++;
+      _vaultStream = _bookService.watchVault();
+    });
+  }
+
   void _openAdd() {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => ReflectionPage(
+          bookService: _bookService,
           onBookSaved: () => Navigator.of(context).pop(),
         ),
       ),
@@ -61,7 +84,10 @@ class _VaultPageState extends State<VaultPage> {
   void _openDetail(Book book) {
     Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => BookDetailPage(book: book),
+        builder: (_) => BookDetailPage(
+          book: book,
+          bookService: _bookService,
+        ),
       ),
     );
   }
@@ -102,19 +128,32 @@ class _VaultPageState extends State<VaultPage> {
         onOpenSettings: widget.onOpenSettings,
         onAddReflection: _openAdd,
       ),
-      body: StreamBuilder<List<Book>>(
-        stream: (widget.bookService ?? BookService.instance).watchBooks(),
+      body: StreamBuilder<VaultBooksState>(
+        key: ValueKey(_vaultGeneration),
+        stream: _vaultStream,
         builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+          final state = snapshot.data;
+          if (state == null) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          final allBooks = snapshot.data ?? const <Book>[];
-          final books = _prepareBooks(allBooks);
-          final loading = snapshot.connectionState == ConnectionState.waiting &&
-              !snapshot.hasData;
-          final searching = _searchQuery.trim().isNotEmpty;
+          if (state.showOfflineEmpty) {
+            return _VaultOfflineEmpty(
+              onRetry: _retryVaultLoad,
+              topInset: VaultAppBar.totalHeight(context),
+            );
+          }
 
+          if (state.hasError && state.books.isEmpty && !state.isLoading) {
+            return _VaultLoadError(
+              state: state,
+              onRetry: _retryVaultLoad,
+              topInset: VaultAppBar.totalHeight(context),
+            );
+          }
+
+          final books = _prepareBooks(state.books);
+          final searching = _searchQuery.trim().isNotEmpty;
           final topBarHeight = VaultAppBar.totalHeight(context);
 
           return Stack(
@@ -122,6 +161,12 @@ class _VaultPageState extends State<VaultPage> {
               CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(child: SizedBox(height: topBarHeight)),
+                  SliverToBoxAdapter(
+                    child: VaultSyncBanner(
+                      state: state,
+                      onRetry: _retryVaultLoad,
+                    ),
+                  ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(
                       InkEchoTokens.gutter,
@@ -169,7 +214,7 @@ class _VaultPageState extends State<VaultPage> {
                           ),
                         ],
                         const SizedBox(height: InkEchoTokens.gap),
-                        if (loading)
+                        if (state.isLoading)
                           const Padding(
                             padding: EdgeInsets.symmetric(vertical: 64),
                             child: Center(child: CircularProgressIndicator()),
@@ -219,6 +264,101 @@ class _VaultPageState extends State<VaultPage> {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _VaultOfflineEmpty extends StatelessWidget {
+  final VoidCallback onRetry;
+  final double topInset;
+
+  const _VaultOfflineEmpty({
+    required this.onRetry,
+    required this.topInset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, topInset + 24, 24, 24),
+      child: Column(
+        children: [
+          Icon(
+            Icons.wifi_off_rounded,
+            size: 56,
+            color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'You\'re offline',
+            style: context.vaultHeadline,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Connect to the internet to load your vault, or retry if you '
+            'were just offline. Cached entries appear automatically when available.',
+            style: context.vaultBodyLg,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 28),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Try again'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VaultLoadError extends StatelessWidget {
+  final VaultBooksState state;
+  final VoidCallback onRetry;
+  final double topInset;
+
+  const _VaultLoadError({
+    required this.state,
+    required this.onRetry,
+    required this.topInset,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24, topInset + 24, 24, 24),
+      child: Column(
+        children: [
+          Icon(
+            Icons.cloud_off_outlined,
+            size: 56,
+            color: scheme.onSurfaceVariant.withValues(alpha: 0.7),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Could not load your vault',
+            style: context.vaultHeadline,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            BookService.messageForError(state.error!),
+            style: context.vaultBodyLg,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 28),
+          FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh),
+            label: const Text('Try again'),
+          ),
+        ],
       ),
     );
   }

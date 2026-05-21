@@ -104,7 +104,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Delete'));
-    await tester.pumpAndSettle();
+    await pumpBrief(tester);
     expect(find.byType(AlertDialog), findsOneWidget);
     await tester.tap(
       find.descendant(
@@ -112,12 +112,12 @@ void main() {
         matching: find.text('Delete'),
       ),
     );
-    await tester.pumpAndSettle();
+    await pumpBrief(tester, const Duration(milliseconds: 600));
 
     expect(find.text('To Remove'), findsNothing);
     expect(find.byType(BookDetailPage), findsNothing);
 
-    final remaining = await service.watchBooks().first;
+    final remaining = await readTestBookDocs();
     expect(remaining, isEmpty);
   });
 
@@ -138,8 +138,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Edit'));
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 500));
+    await pumpBrief(tester, const Duration(milliseconds: 500));
 
     expect(find.byType(ReflectionPage), findsOneWidget);
     expect(find.text('Edit entry'), findsOneWidget);

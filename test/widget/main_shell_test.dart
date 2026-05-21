@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/pages/main_shell.dart';
+import 'package:inkandecho/services/book_service.dart';
 
 import '../helpers/test_helpers.dart';
 
@@ -10,9 +11,10 @@ void main() {
   });
 
   testWidgets('switches between vault and settings tabs', (tester) async {
+    final bookService = createTestBookService();
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(
-        MainShell(onLogout: () {}),
+        MainShell(onLogout: () {}, bookService: bookService),
       ),
     );
     await tester.pumpAndSettle();

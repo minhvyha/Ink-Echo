@@ -2,6 +2,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/pages/vault_page.dart';
+import 'package:inkandecho/services/book_service.dart';
+import 'package:inkandecho/services/connectivity_service.dart';
 
 import '../helpers/test_helpers.dart';
 
@@ -10,8 +12,10 @@ void main() {
     disableGoogleFontRuntimeFetching();
   });
 
-  setUp(() async {
-    await ensureFirebaseInitialized();
+  late BookService emptyVaultService;
+
+  setUp(() {
+    emptyVaultService = createTestBookService();
   });
 
   testWidgets('shows vault header and new entry when library is empty',
@@ -19,7 +23,10 @@ void main() {
     useTallTestSurface(tester);
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(
-        VaultPage(onOpenSettings: () {}),
+        VaultPage(
+          onOpenSettings: () {},
+          bookService: emptyVaultService,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -34,7 +41,10 @@ void main() {
     useTallTestSurface(tester);
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(
-        VaultPage(onOpenSettings: () {}),
+        VaultPage(
+          onOpenSettings: () {},
+          bookService: emptyVaultService,
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -126,11 +136,34 @@ void main() {
     expect(find.text('Beta'), findsNothing);
   });
 
+  testWidgets('shows offline empty state with retry when offline and no books',
+      (tester) async {
+    useTallTestSurface(tester);
+    ConnectivityService.instance.setOnlineForTesting(false);
+    addTearDown(() => ConnectivityService.instance.setOnlineForTesting(true));
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        VaultPage(
+          onOpenSettings: () {},
+          bookService: emptyVaultService,
+        ),
+      ),
+    );
+    await pumpBrief(tester, const Duration(milliseconds: 600));
+
+    expect(find.text('You\'re offline'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+  });
+
   testWidgets('opens drawer from menu button', (tester) async {
     useTallTestSurface(tester);
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(
-        VaultPage(onOpenSettings: () {}),
+        VaultPage(
+          onOpenSettings: () {},
+          bookService: emptyVaultService,
+        ),
       ),
     );
     await tester.pumpAndSettle();

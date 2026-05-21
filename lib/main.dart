@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'services/accessibility_settings.dart';
 import 'services/auth_gate.dart';
 import 'services/auth_service.dart';
+import 'services/connectivity_service.dart';
+import 'services/firestore_bootstrap.dart';
 import 'theme/ink_echo_theme.dart';
 
 /// Boots Firebase and Google Sign-In, loads saved accessibility settings,
@@ -15,6 +17,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await configureFirestore();
+  await ConnectivityService.instance.init();
 
   await AuthService.instance.init();
   await AccessibilitySettings.instance.load();

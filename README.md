@@ -107,6 +107,7 @@ test/unit/ + test/widget/     # Run: flutter test
 ### Firestore data model
 - Path: `users/{userId}/books/{bookId}`
 - Fields: `title`, `author`, `echo`, `mood?`, `coverImageBase64?`, `transcription?`, `createdAt` (server timestamp)
+- **Offline support:** Firestore persistence (`lib/services/firestore_bootstrap.dart`) caches vault data locally. `connectivity_plus` drives offline/sync banners on the vault (`VaultSyncBanner`), a full-screen offline empty state with **Try again**, load-error retry (`BookService.retryConnection`), and **Retry** snackbars on save/delete in reflection and detail screens.
 
 ### Running the app
 
@@ -187,7 +188,7 @@ flutter test
 
 **Widget tests** (`test/widget/`): login validation, vault list/search/navigation (injected `BookService`), reflection create/edit/save, book detail edit/delete confirmation, drawer, bento cards, settings, main shell, and common buttons. Shared helpers in `test/helpers/test_helpers.dart` (`createSeededBookService`, fake permissions).
 
-**82 tests** — run `flutter test` (all should pass).
+**94 tests** — run `flutter test` (all should pass).
 
 ---
 

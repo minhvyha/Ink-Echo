@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/services/book_service.dart';
+import 'package:inkandecho/services/connectivity_service.dart';
 import 'package:inkandecho/utils/image_base64_encoder.dart';
 
 void main() {
@@ -78,6 +79,19 @@ void main() {
       );
     });
 
+    test('watchVault reflects offline connectivity', () async {
+      ConnectivityService.instance.setOnlineForTesting(false);
+      addTearDown(() => ConnectivityService.instance.setOnlineForTesting(true));
+
+      await service.saveBook(title: 'Cached', author: 'A', echo: 'E');
+
+      final state = await service.watchVault().firstWhere(
+        (s) => !s.isLoading && s.books.isNotEmpty,
+      );
+      expect(state.isOffline, isTrue);
+      expect(state.books.first.title, 'Cached');
+    });
+
     test('watchBooks emits saved books for signed-in user', () async {
       await service.saveBook(
         title: 'Book A',
@@ -85,7 +99,7 @@ void main() {
         echo: 'Echo A',
       );
 
-      final books = await service.watchBooks().first;
+      final books = await service.watchBooks().firstWhere((b) => b.isNotEmpty);
       expect(books, hasLength(1));
       expect(books.first.title, 'Book A');
       expect(books.first.author, 'Author A');

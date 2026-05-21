@@ -10,6 +10,7 @@ import 'package:inkandecho/models/book.dart';
 import '../widgets/app_header.dart';
 import '../widgets/common_buttons.dart';
 import '../services/book_service.dart';
+import '../utils/firestore_errors.dart';
 import '../utils/image_base64_encoder.dart';
 import '../utils/media_permissions.dart';
 import '../theme/ink_echo_palette.dart';
@@ -23,11 +24,15 @@ class ReflectionPage extends StatefulWidget {
   final VoidCallback? onBookSaved;
   final BookService? bookService;
 
+  /// When true, skips [SpeechToText] init (used by widget tests to avoid hangs).
+  final bool skipSpeechInit;
+
   const ReflectionPage({
     super.key,
     this.book,
     this.onBookSaved,
     this.bookService,
+    this.skipSpeechInit = false,
   });
 
   @override
@@ -73,7 +78,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
       _coverImageBase64 = existing.coverImageBase64;
       _transcription = existing.transcription;
     }
-    _initSpeech();
+    if (!widget.skipSpeechInit) {
+      _initSpeech();
+    }
   }
 
   /// Initializes [SpeechToText]; failures are non-fatal (voice UI hidden).
@@ -320,8 +327,19 @@ class _ReflectionPageState extends State<ReflectionPage> {
       widget.onBookSaved?.call();
     } catch (e) {
       if (!mounted) return;
+      final offline = isLikelyOfflineError(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not save: $e')),
+        SnackBar(
+          content: Text(
+            offline
+                ? '${messageForFirestoreError(e)} Your entry will sync when you reconnect.'
+                : messageForFirestoreError(e),
+          ),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: _saveBook,
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _saving = false);

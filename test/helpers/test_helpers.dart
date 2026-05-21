@@ -47,6 +47,18 @@ void useTallTestSurface(WidgetTester tester) {
   addTearDown(tester.view.reset);
 }
 
+/// Bounded settle — avoids [pumpAndSettle] hanging on speech/animation timers.
+Future<void> pumpBrief(WidgetTester tester, [Duration duration = const Duration(milliseconds: 400)]) async {
+  await tester.pump();
+  await tester.pump(duration);
+}
+
+/// Scrolls until [finder] is visible (generous limit for long reflection forms).
+Future<void> scrollTo(WidgetTester tester, Finder finder) async {
+  await tester.ensureVisible(finder);
+  await tester.pump();
+}
+
 Book sampleBook({
   String id = 'book-1',
   String title = 'The Left Hand of Darkness',
@@ -71,15 +83,42 @@ Book sampleBook({
 
 const testUserId = 'user-123';
 
+FakeFirebaseFirestore? _activeTestFirestore;
+
 /// Firestore + auth wired for widget tests that need real CRUD without Firebase.
 BookService createTestBookService({FakeFirebaseFirestore? firestore}) {
+  _activeTestFirestore = firestore ?? FakeFirebaseFirestore();
   return BookService.forTesting(
-    firestore: firestore ?? FakeFirebaseFirestore(),
+    firestore: _activeTestFirestore!,
     auth: MockFirebaseAuth(
       signedIn: true,
       mockUser: MockUser(uid: testUserId, email: 'reader@test.com'),
     ),
   );
+}
+
+/// Reads books directly from fake Firestore (avoids stream hangs in widget tests).
+Future<List<Map<String, dynamic>>> readTestBookDocs() async {
+  final firestore = _activeTestFirestore;
+  if (firestore == null) return [];
+  final snap = await firestore
+      .collection('users')
+      .doc(testUserId)
+      .collection('books')
+      .get();
+  return snap.docs.map((d) => d.data()).toList();
+}
+
+Future<Map<String, dynamic>?> readTestBookDoc(String id) async {
+  final firestore = _activeTestFirestore;
+  if (firestore == null) return null;
+  final doc = await firestore
+      .collection('users')
+      .doc(testUserId)
+      .collection('books')
+      .doc(id)
+      .get();
+  return doc.data();
 }
 
 /// Writes one book document with a stable id for widget tests.
@@ -106,6 +145,7 @@ Future<BookService> createSeededBookService({
   String echo = 'Echo',
 }) async {
   final firestore = FakeFirebaseFirestore();
+  _activeTestFirestore = firestore;
   await seedTestBook(
     firestore,
     id: id,

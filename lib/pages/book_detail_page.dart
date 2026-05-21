@@ -10,6 +10,7 @@ import 'package:inkandecho/services/book_service.dart';
 import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
+import 'package:inkandecho/utils/firestore_errors.dart';
 import 'package:inkandecho/widgets/ink_echo_brand.dart';
 
 /// Shows one [Book]; edit opens [ReflectionPage], delete calls [BookService.deleteBook].
@@ -87,8 +88,19 @@ class _BookDetailPageState extends State<BookDetailPage> {
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
+      final offline = isLikelyOfflineError(e);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not delete: $e')),
+        SnackBar(
+          content: Text(
+            offline
+                ? '${messageForFirestoreError(e)} The entry will be removed when you reconnect.'
+                : messageForFirestoreError(e),
+          ),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: _confirmDelete,
+          ),
+        ),
       );
     } finally {
       if (mounted) setState(() => _deleting = false);
