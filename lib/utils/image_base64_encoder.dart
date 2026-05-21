@@ -1,12 +1,14 @@
+// Compress cover photos for storage inside Firestore documents.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-// Firestore doc limit is 1 MiB; keep cover base64 under this.
+/// Firestore doc size limit is 1 MiB; keep base64 cover under this.
 const int maxCoverBase64Length = 450000;
 
-// JPEG compress; returns null if still too large.
+/// Resizes (max width 800), JPEG-compresses, returns base64 or null if too large.
 Future<String?> encodeCoverImageForFirestore(Uint8List rawBytes) async {
   img.Image? decoded;
   try {
@@ -20,6 +22,7 @@ Future<String?> encodeCoverImageForFirestore(Uint8List rawBytes) async {
   var image = img.copyResize(decoded, width: width);
   var quality = 85;
 
+  // Step down quality and width until under [maxCoverBase64Length].
   while (quality >= 35) {
     final jpg = Uint8List.fromList(img.encodeJpg(image, quality: quality));
     final b64 = base64Encode(jpg);

@@ -1,8 +1,11 @@
+// Firebase Authentication + Google Sign-In wrapper.
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:inkandecho/config/google_auth_config.dart';
 
+/// Central auth API: email/password, Google, password reset, user-friendly errors.
 class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
@@ -13,6 +16,7 @@ class AuthService {
   User? get currentUser => _auth.currentUser;
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
+  /// Configures Google Sign-In (Web client id required on Android/iOS).
   Future<void> init() async {
     final webClientId = GoogleAuthConfig.webClientId;
 
@@ -58,6 +62,7 @@ class AuthService {
     return _auth.sendPasswordResetEmail(email: email.trim());
   }
 
+  /// Google flow: native authenticate → id token → Firebase credential.
   Future<UserCredential> signInWithGoogle() async {
     if (kIsWeb) {
       if (!GoogleAuthConfig.isConfigured) {
@@ -93,6 +98,7 @@ class AuthService {
       'Google did not return a sign-in token. Add your debug SHA-1 in Firebase, '
       're-download google-services.json, then run flutter clean && flutter run.';
 
+  /// Maps Firebase/Google errors to short SnackBar-friendly strings.
   static String messageForAuthError(Object error) {
     if (error is GoogleSignInException) {
       switch (error.code) {

@@ -1,3 +1,5 @@
+// Vault list tiles: featured hero card and compact grid cards.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -8,6 +10,7 @@ import 'package:inkandecho/theme/ink_echo_tokens.dart';
 import 'package:inkandecho/theme/ink_echo_typography.dart';
 import 'package:inkandecho/utils/book_format.dart';
 
+/// Large first-row card for the newest or highlighted entry.
 class VaultFeaturedCard extends StatelessWidget {
   final Book book;
   final VoidCallback onTap;
@@ -49,6 +52,7 @@ class VaultFeaturedCard extends StatelessWidget {
   }
 }
 
+/// Standard grid/list card for a vault entry.
 class VaultEntryCard extends StatelessWidget {
   final Book book;
   final VoidCallback onTap;
@@ -91,6 +95,7 @@ class VaultEntryCard extends StatelessWidget {
   }
 }
 
+/// Dashed CTA tile that opens [ReflectionPage] for a new entry.
 class VaultNewEntryCard extends StatelessWidget {
   final VoidCallback onWrite;
 

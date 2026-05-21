@@ -1,5 +1,11 @@
+// Domain model for one vault entry stored under users/{uid}/books/{id}.
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// A single reading journal entry (book + reflection metadata).
+///
+/// Maps to Firestore fields: title, author, echo, mood, coverImageBase64,
+/// transcription, createdAt.
 class Book {
   final String id;
   final String title;
@@ -21,6 +27,7 @@ class Book {
     this.createdAt,
   });
 
+  /// Builds a [Book] from a Firestore document snapshot.
   factory Book.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
     final raw = data['createdAt'];
@@ -40,6 +47,7 @@ class Book {
     );
   }
 
+  /// Payload for [BookService.saveBook]; sets server timestamp on create.
   Map<String, dynamic> toCreateMap() {
     return {
       'title': title,
@@ -54,6 +62,7 @@ class Book {
     };
   }
 
+  /// Payload for [BookService.updateBook]; omits createdAt, clears empty optionals.
   static Map<String, dynamic> fieldsForUpdate({
     required String title,
     required String author,

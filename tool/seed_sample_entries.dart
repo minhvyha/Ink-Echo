@@ -1,3 +1,6 @@
+// CLI: signs into test account and writes [sampleVaultEntries] to Firestore.
+// Usage: dart run tool/seed_sample_entries.dart
+
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';

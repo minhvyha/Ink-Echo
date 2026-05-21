@@ -1,9 +1,12 @@
+// User preferences: theme, text scale, high contrast, sign-out.
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/accessibility_settings.dart';
 import '../theme/ink_echo_theme.dart';
 import '../widgets/ink_echo_brand.dart';
 
+/// Second tab in [MainShell]; changes persist via [AccessibilitySettings].
 class SettingsPage extends StatelessWidget {
   final VoidCallback onLogout;
 

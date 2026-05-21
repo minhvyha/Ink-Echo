@@ -1,5 +1,7 @@
-// Firebase Web client ID for Google Sign-In on Android/iOS. Setup: README.
+// Firebase Web OAuth client ID — required for Google Sign-In on Android/iOS.
+// Setup steps: README → Google sign-in section.
 
+/// Holds the Web client ID used as [GoogleSignIn] serverClientId on mobile.
 abstract final class GoogleAuthConfig {
   static const String webClientId = String.fromEnvironment(
     'GOOGLE_WEB_CLIENT_ID',

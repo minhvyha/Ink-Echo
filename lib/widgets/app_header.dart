@@ -1,6 +1,9 @@
+// Top bar for reflection flow: brand + optional search/close actions.
+
 import 'package:flutter/material.dart';
 import 'ink_echo_brand.dart';
 
+/// Used on [ReflectionPage]; [showClose] pops the route when tapped.
 class AppHeader extends StatelessWidget {
   final bool showSearch;
   final bool showClose;

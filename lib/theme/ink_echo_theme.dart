@@ -1,8 +1,11 @@
+// Material 3 themes: light/dark + optional high-contrast overrides.
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'ink_echo_palette.dart';
 import 'ink_echo_tokens.dart';
 
+/// Builds [ThemeData] from [InkEchoTokens] and [InkEchoPalette] extensions.
 class InkEchoTheme {
   static ThemeData light({required bool highContrast}) {
     final scheme = highContrast

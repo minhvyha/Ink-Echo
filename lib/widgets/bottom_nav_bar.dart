@@ -1,8 +1,11 @@
+// Frosted bottom bar for [MainShell] (Vault / Settings tabs).
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import '../theme/ink_echo_typography.dart';
 
+/// Two-tab navigation; [currentIndex] matches [MainShell] IndexedStack.
 class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onChanged;

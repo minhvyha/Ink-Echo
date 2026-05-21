@@ -1,9 +1,12 @@
+// Pinned vault header: menu, search mode, safe-area top inset.
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:inkandecho/theme/ink_echo_typography.dart';
 import '../ink_echo_brand.dart';
 
+/// Overlay app bar; [totalHeight] includes notch/status bar for list padding.
 class VaultAppBar extends StatelessWidget {
   static const double toolbarHeight = 64;
 

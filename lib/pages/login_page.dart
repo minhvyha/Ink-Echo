@@ -1,9 +1,12 @@
+// Sign-in / sign-up: email/password and Google via [AuthService].
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:inkandecho/services/auth_service.dart';
 import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 
+/// Authentication screen shown when no Firebase user is signed in.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -27,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
+  /// Validates form, runs [action], shows [AuthService.messageForAuthError] on failure.
   Future<void> _runAuth(Future<void> Function() action) async {
     if (_loading) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;

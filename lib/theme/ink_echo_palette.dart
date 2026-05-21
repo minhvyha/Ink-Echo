@@ -1,5 +1,8 @@
+// Extra semantic colors (inputs, stats, cards) beyond Material [ColorScheme].
+
 import 'package:flutter/material.dart';
 
+/// Custom colors accessed via `Theme.of(context).extension<InkEchoPalette>()`.
 @immutable
 class InkEchoPalette extends ThemeExtension<InkEchoPalette> {
   final Color inputFill;

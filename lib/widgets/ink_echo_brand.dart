@@ -1,6 +1,9 @@
+// Shared logo + wordmark used on vault, settings, and drawer.
+
 import 'package:flutter/material.dart';
 import '../theme/ink_echo_typography.dart';
 
+/// Scales down on narrow widths via [FittedBox] to avoid overflow.
 class InkEchoBrand extends StatelessWidget {
   const InkEchoBrand({super.key});
 

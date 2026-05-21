@@ -1,6 +1,9 @@
+// Vault typography via Google Fonts (Playfair Display + Inter).
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+/// Text styles for vault, cards, and headers (theme-aware colors).
 extension InkEchoTypography on BuildContext {
   TextStyle get vaultDisplayLg => GoogleFonts.playfairDisplay(
         fontSize: 40,

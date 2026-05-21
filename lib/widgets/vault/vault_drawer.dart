@@ -1,8 +1,11 @@
+// Side menu: sort order, settings shortcut, add reflection.
+
 import 'package:flutter/material.dart';
 import 'package:inkandecho/theme/ink_echo_typography.dart';
 import 'package:inkandecho/utils/vault_book_list.dart';
 import 'package:inkandecho/widgets/ink_echo_brand.dart';
 
+/// Opened from [VaultPage] hamburger; sort is applied client-side in vault state.
 class VaultDrawer extends StatelessWidget {
   final VaultSortOrder sortOrder;
   final ValueChanged<VaultSortOrder> onSortChanged;

@@ -1,3 +1,5 @@
+// Create or edit a vault entry: title, mood, echo, cover photo, voice note.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -13,6 +15,9 @@ import '../utils/media_permissions.dart';
 import '../theme/ink_echo_palette.dart';
 import '../theme/ink_echo_theme.dart';
 
+/// Form for adding a new book or editing an existing one ([book] non-null).
+///
+/// Persists via [BookService.saveBook] (create) or [BookService.updateBook] (edit).
 class ReflectionPage extends StatefulWidget {
   final Book? book;
   final VoidCallback? onBookSaved;
@@ -45,6 +50,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     'Nostalgic',
   ];
 
+  /// True when opened from [BookDetailPage] with an existing [Book].
   bool get _isEditing => widget.book != null;
 
   @override
@@ -62,6 +68,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     _initSpeech();
   }
 
+  /// Initializes [SpeechToText]; failures are non-fatal (voice UI hidden).
   Future<void> _initSpeech() async {
     try {
       _speechAvailable = await _speech.initialize(
@@ -170,6 +177,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     );
   }
 
+  /// Starts/stops dictation; final transcript stored in [_transcription].
   Future<void> _toggleListening() async {
     if (_isListening) {
       await _speech.stop();
@@ -247,6 +255,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     });
   }
 
+  /// Validates fields, then create ([BookService.saveBook]) or update ([BookService.updateBook]).
   Future<void> _saveBook() async {
     if (_saving) return;
     if (_isListening) {

@@ -1,3 +1,5 @@
+// Home vault: live Firestore list, search, sort drawer, bento cards.
+
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
 import 'package:inkandecho/pages/book_detail_page.dart';
@@ -10,6 +12,10 @@ import 'package:inkandecho/widgets/vault/vault_app_bar.dart';
 import 'package:inkandecho/widgets/vault/vault_bento_cards.dart';
 import 'package:inkandecho/widgets/vault/vault_drawer.dart';
 
+/// Main library screen after sign-in ([MainShell] tab 0).
+///
+/// Streams books via [BookService.watchBooks], supports client-side
+/// search/sort, and opens reflection/detail flows.
 class VaultPage extends StatefulWidget {
   final VoidCallback onOpenSettings;
 
@@ -24,8 +30,10 @@ class _VaultPageState extends State<VaultPage> {
   final _searchController = TextEditingController();
   final _searchFocus = FocusNode();
 
+  /// App bar toggles between brand row and inline search field.
   bool _searchActive = false;
   String _searchQuery = '';
+  /// Persisted only for this session; chosen from [VaultDrawer].
   VaultSortOrder _sortOrder = VaultSortOrder.newest;
 
   @override
@@ -73,6 +81,7 @@ class _VaultPageState extends State<VaultPage> {
     });
   }
 
+  /// Applies drawer sort order, then app-bar search filter.
   List<Book> _prepareBooks(List<Book> books) {
     final sorted = sortVaultBooks(books, _sortOrder);
     return filterVaultBooks(sorted, _searchQuery);

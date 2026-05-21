@@ -1,8 +1,11 @@
+// Signed-in shell: Vault + Settings tabs with bottom navigation.
+
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
 import 'vault_page.dart';
 import 'settings_page.dart';
 
+/// Hosts [VaultPage] and [SettingsPage]; preserves tab state via [IndexedStack].
 class MainShell extends StatefulWidget {
   final VoidCallback onLogout;
 

@@ -1,6 +1,9 @@
+// Display helpers for vault cards and detail (dates, quotes, tags, palettes).
+
 import 'package:flutter/material.dart';
 import 'package:inkandecho/models/book.dart';
 
+/// Short date label for cards, e.g. "May 17".
 String formatBookDate(DateTime? date) {
   if (date == null) return 'Recently';
   const months = [
@@ -10,9 +13,11 @@ String formatBookDate(DateTime? date) {
   return '${months[date.month - 1]} ${date.day}';
 }
 
+/// Uppercase variant for card metadata chips.
 String formatBookDateLabel(DateTime? date) =>
     formatBookDate(date).toUpperCase();
 
+/// Primary quote: echo text, else transcription, else placeholder.
 String quoteForBook(Book book) {
   final echo = book.echo.trim();
   if (echo.isNotEmpty) return echo;
@@ -21,6 +26,7 @@ String quoteForBook(Book book) {
   return 'A quiet moment waiting to be remembered.';
 }
 
+/// Chips shown on bento cards (mood, voice note, photo, etc.).
 List<String> tagsForBook(Book book) {
   final tags = <String>[];
   if (book.mood != null && book.mood!.isNotEmpty) {
@@ -37,6 +43,7 @@ List<String> tagsForBook(Book book) {
   return tags.take(3).toList();
 }
 
+/// Rough reading time from word count (200 wpm).
 String estimateReadLabel(Book book) {
   final words = '${book.echo} ${book.transcription ?? ''}'
       .trim()
@@ -47,6 +54,7 @@ String estimateReadLabel(Book book) {
   return '$minutes min read';
 }
 
+/// Stable accent colors per book id for card variety in light/dark mode.
 (Color bg, Color accent) bookCardPalette(String id, Brightness brightness) {
   final palettes = [
     (const Color(0xFFF0EBDD), const Color(0xFFB5E5E0)),

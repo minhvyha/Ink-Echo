@@ -1,5 +1,8 @@
+// Reusable CTA styles for reflection and login screens.
+
 import 'package:flutter/material.dart';
 
+/// Primary action with gradient fill and icon (e.g. Save reflection).
 class GradientButton extends StatelessWidget {
   final String text;
   final IconData icon;
@@ -58,6 +61,7 @@ class GradientButton extends StatelessWidget {
   }
 }
 
+/// Outlined pill for secondary actions (e.g. mood chips).
 class PillButton extends StatelessWidget {
   final String text;
   final Color background;
@@ -92,6 +96,7 @@ class PillButton extends StatelessWidget {
   }
 }
 
+/// Compact toggle on login (Sign in / Sign up mode).
 class MiniLoginChip extends StatelessWidget {
   final double width;
   final Widget child;

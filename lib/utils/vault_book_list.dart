@@ -1,11 +1,15 @@
+// Client-side vault search and sort (no extra Firestore queries).
+
 import 'package:inkandecho/models/book.dart';
 
+/// Sort options exposed in [VaultDrawer].
 enum VaultSortOrder {
   newest,
   oldest,
   title,
 }
 
+/// Case-insensitive filter across title, author, echo, mood, transcription.
 List<Book> filterVaultBooks(List<Book> books, String query) {
   final q = query.trim().toLowerCase();
   if (q.isEmpty) return books;
@@ -22,6 +26,7 @@ List<Book> filterVaultBooks(List<Book> books, String query) {
   }).toList();
 }
 
+/// Returns a new sorted list; does not mutate the input.
 List<Book> sortVaultBooks(List<Book> books, VaultSortOrder order) {
   final sorted = List<Book>.from(books);
   switch (order) {

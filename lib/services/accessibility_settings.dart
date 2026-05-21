@@ -1,6 +1,11 @@
+// Global accessibility preferences (theme, text scale) via SharedPreferences.
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Singleton [ChangeNotifier] read by [MyApp] and [SettingsPage].
+///
+/// Persists: dark mode, text scale, bold text, reduce motion, high contrast.
 class AccessibilitySettings extends ChangeNotifier {
   AccessibilitySettings._();
   static final AccessibilitySettings instance = AccessibilitySettings._();
@@ -32,6 +37,7 @@ class AccessibilitySettings extends ChangeNotifier {
     return 'Extra large';
   }
 
+  /// Loads prefs from disk; call once in [main] before [runApp].
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     _darkMode = prefs.getBool(_keyDarkMode) ?? false;

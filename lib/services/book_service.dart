@@ -1,9 +1,15 @@
+// Firestore CRUD for per-user book entries (users/{uid}/books).
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:inkandecho/models/book.dart';
 import 'package:inkandecho/utils/image_base64_encoder.dart';
 
+/// Singleton gateway to the signed-in user's `books` subcollection.
+///
+/// All paths are scoped by [FirebaseAuth.currentUser] so each account
+/// only sees its own vault data.
 class BookService {
   BookService._({
     FirebaseFirestore? firestore,
@@ -13,6 +19,7 @@ class BookService {
 
   static final BookService instance = BookService._();
 
+  /// Injected Firestore/Auth for unit tests ([fake_cloud_firestore]).
   @visibleForTesting
   factory BookService.forTesting({
     required FirebaseFirestore firestore,
@@ -24,12 +31,14 @@ class BookService {
   final FirebaseFirestore _db;
   final FirebaseAuth _auth;
 
+  /// Returns `users/{uid}/books` or null when signed out.
   CollectionReference<Map<String, dynamic>>? _booksRef() {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return null;
     return _db.collection('users').doc(uid).collection('books');
   }
 
+  /// Live list of entries, newest first (requires Firestore index on createdAt).
   Stream<List<Book>> watchBooks() {
     final ref = _booksRef();
     if (ref == null) {
@@ -41,6 +50,7 @@ class BookService {
         .map((snap) => snap.docs.map(Book.fromDoc).toList());
   }
 
+  /// Creates a new document with auto-generated id.
   Future<void> saveBook({
     required String title,
     required String author,
@@ -72,6 +82,7 @@ class BookService {
     await ref.add(book.toCreateMap());
   }
 
+  /// Overwrites fields on an existing entry; clears optional fields when empty.
   Future<void> updateBook({
     required String bookId,
     required String title,
@@ -100,6 +111,7 @@ class BookService {
     );
   }
 
+  /// Permanently removes one entry from the vault.
   Future<void> deleteBook(String bookId) async {
     final ref = _booksRef();
     if (ref == null) {

@@ -1,5 +1,8 @@
+// Design tokens: color roles, spacing, radii, and [ColorScheme] factories.
+
 import 'package:flutter/material.dart';
 
+/// Core brand colors and layout constants shared across vault UI.
 abstract final class InkEchoTokens {
   static const primary = Color(0xFF28695C);
   static const onPrimary = Color(0xFFFFFFFF);

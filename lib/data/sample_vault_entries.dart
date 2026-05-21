@@ -1,3 +1,6 @@
+// Demo content for seeding the test account (see docs/sample_vault_entries.md).
+
+/// One predefined journal row used by [tool/seed_sample_entries.dart].
 class SampleVaultEntry {
   final String title;
   final String author;

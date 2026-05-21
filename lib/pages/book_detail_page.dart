@@ -1,3 +1,5 @@
+// Read-only vault entry view with edit and delete actions.
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -10,6 +12,7 @@ import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
 import 'package:inkandecho/widgets/ink_echo_brand.dart';
 
+/// Shows one [Book]; edit opens [ReflectionPage], delete calls [BookService.deleteBook].
 class BookDetailPage extends StatefulWidget {
   final Book book;
 
@@ -24,6 +27,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
   Book get book => widget.book;
 
+  /// Pushes [ReflectionPage]; pops detail when save succeeds.
   Future<void> _openEdit() async {
     final updated = await Navigator.of(context).push<bool>(
       MaterialPageRoute<bool>(
@@ -38,6 +42,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
     }
   }
 
+  /// Confirms, deletes from Firestore, then pops back to vault.
   Future<void> _confirmDelete() async {
     final scheme = Theme.of(context).colorScheme;
     final title = book.title.isEmpty ? 'this entry' : book.title;
