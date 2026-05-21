@@ -130,6 +130,35 @@ void main() {
       expect(data.containsKey('mood'), isFalse);
     });
 
+    test('updateBook throws when user is not signed in', () async {
+      final signedOut = BookService.forTesting(
+        firestore: firestore,
+        auth: MockFirebaseAuth(),
+      );
+
+      expect(
+        () => signedOut.updateBook(
+          bookId: 'any',
+          title: 'T',
+          author: 'A',
+          echo: '',
+        ),
+        throwsA(isA<StateError>()),
+      );
+    });
+
+    test('deleteBook throws when user is not signed in', () async {
+      final signedOut = BookService.forTesting(
+        firestore: firestore,
+        auth: MockFirebaseAuth(),
+      );
+
+      expect(
+        () => signedOut.deleteBook('any'),
+        throwsA(isA<StateError>()),
+      );
+    });
+
     test('deleteBook removes document', () async {
       await service.saveBook(title: 'Gone', author: 'A', echo: '');
       final id = (await firestore

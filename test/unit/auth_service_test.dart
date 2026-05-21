@@ -25,6 +25,39 @@ void main() {
       );
     });
 
+    test('maps additional FirebaseAuthException codes', () {
+      expect(
+        AuthService.messageForAuthError(
+          FirebaseAuthException(code: 'user-disabled'),
+        ),
+        'This account has been disabled.',
+      );
+      expect(
+        AuthService.messageForAuthError(
+          FirebaseAuthException(code: 'email-already-in-use'),
+        ),
+        'An account already exists for this email.',
+      );
+      expect(
+        AuthService.messageForAuthError(
+          FirebaseAuthException(code: 'too-many-requests'),
+        ),
+        'Too many attempts. Try again later.',
+      );
+      expect(
+        AuthService.messageForAuthError(
+          FirebaseAuthException(code: 'operation-not-allowed'),
+        ),
+        'This sign-in method is not enabled in Firebase.',
+      );
+      expect(
+        AuthService.messageForAuthError(
+          FirebaseAuthException(code: 'invalid-credential'),
+        ),
+        'Email or password is incorrect.',
+      );
+    });
+
     test('falls back for unknown errors', () {
       expect(
         AuthService.messageForAuthError(

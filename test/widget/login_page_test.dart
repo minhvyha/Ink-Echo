@@ -71,4 +71,26 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.visibility_off_outlined), findsOneWidget);
   });
+
+  testWidgets('valid email and password pass field validation', (tester) async {
+    useTallTestSurface(tester);
+    await tester.pumpWidget(wrapWithInkEchoNavigator(const LoginPage()));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField).at(0), 'reader@example.com');
+    await tester.enterText(find.byType(TextFormField).at(1), 'secret12');
+
+    await tester.scrollUntilVisible(
+      find.widgetWithText(ElevatedButton, 'Sign in'),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Sign in'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Email is required'), findsNothing);
+    expect(find.text('Password is required'), findsNothing);
+    expect(find.text('Enter a valid email'), findsNothing);
+    expect(find.text('Use at least 6 characters'), findsNothing);
+  });
 }

@@ -15,8 +15,13 @@ import 'package:inkandecho/widgets/ink_echo_brand.dart';
 /// Shows one [Book]; edit opens [ReflectionPage], delete calls [BookService.deleteBook].
 class BookDetailPage extends StatefulWidget {
   final Book book;
+  final BookService? bookService;
 
-  const BookDetailPage({super.key, required this.book});
+  const BookDetailPage({
+    super.key,
+    required this.book,
+    this.bookService,
+  });
 
   @override
   State<BookDetailPage> createState() => _BookDetailPageState();
@@ -26,6 +31,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
   bool _deleting = false;
 
   Book get book => widget.book;
+  BookService get _bookService => widget.bookService ?? BookService.instance;
 
   /// Pushes [ReflectionPage]; pops detail when save succeeds.
   Future<void> _openEdit() async {
@@ -33,6 +39,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
       MaterialPageRoute<bool>(
         builder: (ctx) => ReflectionPage(
           book: book,
+          bookService: widget.bookService,
           onBookSaved: () => Navigator.of(ctx).pop(true),
         ),
       ),
@@ -72,7 +79,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
 
     setState(() => _deleting = true);
     try {
-      await BookService.instance.deleteBook(book.id);
+      await _bookService.deleteBook(book.id);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Entry deleted.')),

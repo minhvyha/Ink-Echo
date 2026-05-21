@@ -21,8 +21,14 @@ import '../theme/ink_echo_theme.dart';
 class ReflectionPage extends StatefulWidget {
   final Book? book;
   final VoidCallback? onBookSaved;
+  final BookService? bookService;
 
-  const ReflectionPage({super.key, this.book, this.onBookSaved});
+  const ReflectionPage({
+    super.key,
+    this.book,
+    this.onBookSaved,
+    this.bookService,
+  });
 
   @override
   State<ReflectionPage> createState() => _ReflectionPageState();
@@ -52,6 +58,8 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
   /// True when opened from [BookDetailPage] with an existing [Book].
   bool get _isEditing => widget.book != null;
+
+  BookService get _bookService => widget.bookService ?? BookService.instance;
 
   @override
   void initState() {
@@ -279,7 +287,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     setState(() => _saving = true);
     try {
       if (_isEditing) {
-        await BookService.instance.updateBook(
+        await _bookService.updateBook(
           bookId: widget.book!.id,
           title: title,
           author: author,
@@ -289,7 +297,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
           transcription: _transcription,
         );
       } else {
-        await BookService.instance.saveBook(
+        await _bookService.saveBook(
           title: title,
           author: author,
           echo: _echo.text.trim(),

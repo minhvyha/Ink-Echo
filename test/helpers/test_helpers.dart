@@ -1,10 +1,16 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_core_platform_interface/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inkandecho/models/book.dart';
+import 'package:inkandecho/services/book_service.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler_platform_interface/permission_handler_platform_interface.dart';
 
 bool _firebaseInitialized = false;
 
@@ -61,6 +67,82 @@ Book sampleBook({
     coverImageBase64: coverImageBase64,
     createdAt: createdAt ?? DateTime(2025, 5, 10),
   );
+}
+
+const testUserId = 'user-123';
+
+/// Firestore + auth wired for widget tests that need real CRUD without Firebase.
+BookService createTestBookService({FakeFirebaseFirestore? firestore}) {
+  return BookService.forTesting(
+    firestore: firestore ?? FakeFirebaseFirestore(),
+    auth: MockFirebaseAuth(
+      signedIn: true,
+      mockUser: MockUser(uid: testUserId, email: 'reader@test.com'),
+    ),
+  );
+}
+
+/// Writes one book document with a stable id for widget tests.
+Future<void> seedTestBook(
+  FakeFirebaseFirestore firestore, {
+  required String id,
+  required String title,
+  String author = 'Author',
+  String echo = 'Echo',
+  DateTime? createdAt,
+}) async {
+  await firestore.collection('users').doc(testUserId).collection('books').doc(id).set({
+    'title': title,
+    'author': author,
+    'echo': echo,
+    'createdAt': Timestamp.fromDate(createdAt ?? DateTime(2025, 5, 20)),
+  });
+}
+
+Future<BookService> createSeededBookService({
+  required String id,
+  required String title,
+  String author = 'Author',
+  String echo = 'Echo',
+}) async {
+  final firestore = FakeFirebaseFirestore();
+  await seedTestBook(
+    firestore,
+    id: id,
+    title: title,
+    author: author,
+    echo: echo,
+  );
+  return createTestBookService(firestore: firestore);
+}
+
+/// Stubs [Permission.request] results for camera, photos, and microphone tests.
+class FakePermissionHandler extends PermissionHandlerPlatform {
+  FakePermissionHandler(this._status);
+
+  final PermissionStatus _status;
+
+  @override
+  Future<Map<Permission, PermissionStatus>> requestPermissions(
+    List<Permission> permissions,
+  ) async {
+    return {for (final p in permissions) p: _status};
+  }
+}
+
+PermissionHandlerPlatform? _savedPermissionHandler;
+
+void installFakePermissions(PermissionStatus status) {
+  _savedPermissionHandler ??= PermissionHandlerPlatform.instance;
+  PermissionHandlerPlatform.instance = FakePermissionHandler(status);
+}
+
+void resetPermissionHandler() {
+  final saved = _savedPermissionHandler;
+  if (saved != null) {
+    PermissionHandlerPlatform.instance = saved;
+    _savedPermissionHandler = null;
+  }
 }
 
 List<Book> sampleBookList() {

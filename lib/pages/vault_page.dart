@@ -18,8 +18,13 @@ import 'package:inkandecho/widgets/vault/vault_drawer.dart';
 /// search/sort, and opens reflection/detail flows.
 class VaultPage extends StatefulWidget {
   final VoidCallback onOpenSettings;
+  final BookService? bookService;
 
-  const VaultPage({super.key, required this.onOpenSettings});
+  const VaultPage({
+    super.key,
+    required this.onOpenSettings,
+    this.bookService,
+  });
 
   @override
   State<VaultPage> createState() => _VaultPageState();
@@ -98,7 +103,7 @@ class _VaultPageState extends State<VaultPage> {
         onAddReflection: _openAdd,
       ),
       body: StreamBuilder<List<Book>>(
-        stream: BookService.instance.watchBooks(),
+        stream: (widget.bookService ?? BookService.instance).watchBooks(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));

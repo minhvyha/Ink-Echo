@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/pages/book_detail_page.dart';
+import 'package:inkandecho/pages/reflection_page.dart';
 
 import '../helpers/test_helpers.dart';
 
@@ -57,5 +58,94 @@ void main() {
 
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
+  });
+
+  testWidgets('delete shows confirmation dialog and cancel keeps page',
+      (tester) async {
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(BookDetailPage(book: sampleBook())),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete entry?'), findsOneWidget);
+    expect(find.textContaining('cannot be undone'), findsOneWidget);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Delete entry?'), findsNothing);
+    expect(find.text('Edit'), findsOneWidget);
+  });
+
+  testWidgets('confirming delete removes entry and pops route', (tester) async {
+    final service = await createSeededBookService(
+      id: 'delete-me',
+      title: 'To Remove',
+      echo: 'Gone soon',
+    );
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        Material(
+          child: Navigator(
+            onGenerateRoute: (_) => MaterialPageRoute<void>(
+              builder: (_) => BookDetailPage(
+                book: sampleBook(id: 'delete-me', title: 'To Remove'),
+                bookService: service,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Delete'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AlertDialog), findsOneWidget);
+    await tester.tap(
+      find.descendant(
+        of: find.byType(AlertDialog),
+        matching: find.text('Delete'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('To Remove'), findsNothing);
+    expect(find.byType(BookDetailPage), findsNothing);
+
+    final remaining = await service.watchBooks().first;
+    expect(remaining, isEmpty);
+  });
+
+  testWidgets('edit opens reflection form with existing title', (tester) async {
+    final book = sampleBook(title: 'Editable Title', author: 'Author');
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        Material(
+          child: Navigator(
+            onGenerateRoute: (_) => MaterialPageRoute<void>(
+              builder: (_) => BookDetailPage(book: book),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Edit'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.byType(ReflectionPage), findsOneWidget);
+    expect(find.text('Edit entry'), findsOneWidget);
+    expect(
+      tester.widget<TextField>(find.byType(TextField).first).controller?.text,
+      'Editable Title',
+    );
   });
 }

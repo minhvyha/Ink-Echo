@@ -1,3 +1,4 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/pages/vault_page.dart';
@@ -43,6 +44,86 @@ void main() {
 
     expect(find.byType(TextField), findsOneWidget);
     expect(find.text('Results'), findsNothing);
+  });
+
+  testWidgets('displays seeded books from injected BookService', (tester) async {
+    useTallTestSurface(tester);
+    final service = await createSeededBookService(
+      id: 'seed-1',
+      title: 'Seeded Book',
+      echo: 'A reflection',
+    );
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        VaultPage(onOpenSettings: () {}, bookService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Seeded Book'), findsOneWidget);
+  });
+
+  testWidgets('tapping featured card opens book detail', (tester) async {
+    useTallTestSurface(tester);
+    final service = await createSeededBookService(
+      id: 'feat-1',
+      title: 'Featured Entry',
+      echo: 'Echo text',
+    );
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        Material(
+          child: VaultPage(
+            onOpenSettings: () {},
+            bookService: service,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Featured Entry'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Echo text'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+  });
+
+  testWidgets('search filters visible entries', (tester) async {
+    useTallTestSurface(tester);
+    final firestore = FakeFirebaseFirestore();
+    await seedTestBook(
+      firestore,
+      id: 'a1',
+      title: 'Alpha',
+      echo: 'alpha echo',
+      createdAt: DateTime(2025, 5, 20),
+    );
+    await seedTestBook(
+      firestore,
+      id: 'b1',
+      title: 'Beta',
+      echo: 'beta echo',
+      createdAt: DateTime(2025, 5, 19),
+    );
+    final service = createTestBookService(firestore: firestore);
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(
+        VaultPage(onOpenSettings: () {}, bookService: service),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byIcon(Icons.search));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Alpha');
+    await tester.pumpAndSettle();
+
+    expect(find.text('1 entry found'), findsOneWidget);
+    expect(find.text('Beta'), findsNothing);
   });
 
   testWidgets('opens drawer from menu button', (tester) async {

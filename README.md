@@ -183,9 +183,11 @@ Run the full suite:
 flutter test
 ```
 
-**Unit tests** (`test/unit/`): `Book` model, `book_format`, vault filter/sort, image encoding, `AuthService` error messages, `AccessibilitySettings`, and `BookService` (with `fake_cloud_firestore` + `firebase_auth_mocks`).
+**Unit tests** (`test/unit/`): `Book`, `BookService` (CRUD + signed-out errors), `book_format`, vault filter/sort, image encoding, `AuthService` error mapping, `AccessibilitySettings`, `media_permissions` (mocked platform), `GoogleAuthConfig`, and sample seed data.
 
-**Widget tests** (`test/widget/`): login validation and sign-up toggle, vault app bar search, drawer navigation/sort, bento cards, book detail, reflection form validation, main shell tab switching, settings toggles, and more. Shared helpers live in `test/helpers/test_helpers.dart`.
+**Widget tests** (`test/widget/`): login validation, vault list/search/navigation (injected `BookService`), reflection create/edit/save, book detail edit/delete confirmation, drawer, bento cards, settings, main shell, and common buttons. Shared helpers in `test/helpers/test_helpers.dart` (`createSeededBookService`, fake permissions).
+
+**82 tests** — run `flutter test` (all should pass).
 
 ---
 
@@ -203,14 +205,15 @@ flutter test
 - **Edit** opens the same form as “Add reflection”; there is no inline edit on the vault list itself.
 - Voice is stored as **transcription text**, not playable audio files.
 - Cover images are stored as **base64 in Firestore** (size-capped); Firebase Storage is not used.
-- `home_page.dart` is legacy/unused; the main flow is `AuthGate` → `MainShell` → `VaultPage`.
 
 ### Platform notes
 - Tested target: **iOS / Android** (primary). Web may require extra Firebase/Google configuration.
 - Firebase config is in `lib/firebase_options.dart` (project-specific; do not commit private keys outside what FlutterFire generates).
 
 ### Contact
-*[Add your name, student ID, and university email here before submission.]*
+Name: Minh Vy Ha
+Student ID: 48485837
+Contact Email: minhvy.ha@students.mq.edu.au
 
 ---
 
