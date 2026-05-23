@@ -35,6 +35,7 @@ class AppHeader extends StatelessWidget {
           else if (showClose)
             IconButton(
               icon: Icon(Icons.close, color: scheme.onSurfaceVariant),
+              tooltip: 'Close reflection form',
               onPressed: onClose ?? () => Navigator.of(context).maybePop(),
               style: IconButton.styleFrom(shape: const CircleBorder()),
             ),

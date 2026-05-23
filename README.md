@@ -37,6 +37,7 @@ After signing in, you build a personal **Vault** of book entries stored in the c
 ### Settings & accessibility
 - Account summary and **sign out**.
 - **Dark mode**, text size, bold text, high contrast, and reduce motion (persisted with `shared_preferences`).
+- **Screen reader support:** descriptive labels on vault, reflection, and detail actions; TalkBack/VoiceOver announcements when an entry is saved or deleted (`lib/utils/a11y_announce.dart`).
 
 ### Assignment requirements (summary)
 
@@ -98,6 +99,7 @@ lib/
 ├── services/                 # auth, book CRUD, accessibility prefs
 ├── theme/                    # tokens, typography, light/dark themes
 ├── utils/                    # image encoding, permissions, vault filter/sort
+├── utils/a11y_announce.dart  # Screen reader announcements for save/delete
 └── widgets/                  # nav bar, vault UI, brand, buttons
 docs/sample_vault_entries.md  # Demo copy + cover image search terms
 tool/seed_sample_entries.dart # Seed test account (dart run tool/...)
@@ -200,7 +202,8 @@ flutter test
 3. **Read** — entries appear in the Vault; tap for detail view.
 4. **Search & sort** — Vault app bar search; drawer sort options.
 5. **Settings** — accessibility toggles and sign out.
-6. **Privacy** — second account should not see the first account’s books (separate Firebase users).
+6. **Screen readers** — enable TalkBack (Android) or VoiceOver (iOS); confirm icon buttons are announced clearly and save/delete are spoken aloud.
+7. **Privacy** — second account should not see the first account’s books (separate Firebase users).
 
 ### Known limitations (honest scope)
 - **Edit** opens the same form as “Add reflection”; there is no inline edit on the vault list itself.

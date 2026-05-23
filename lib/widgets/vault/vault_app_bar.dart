@@ -60,14 +60,14 @@ class VaultAppBar extends StatelessWidget {
         IconButton(
           onPressed: onMenuTap,
           icon: Icon(Icons.menu, color: scheme.onSurfaceVariant),
-          tooltip: 'Menu',
+          tooltip: 'Open vault menu',
           style: IconButton.styleFrom(shape: const CircleBorder()),
         ),
         const Expanded(child: Center(child: InkEchoBrand())),
         IconButton(
           onPressed: onSearchTap,
           icon: Icon(Icons.search, color: scheme.onSurfaceVariant),
-          tooltip: 'Search',
+          tooltip: 'Search vault entries',
           style: IconButton.styleFrom(shape: const CircleBorder()),
         ),
       ],
@@ -82,14 +82,17 @@ class VaultAppBar extends StatelessWidget {
         IconButton(
           onPressed: onSearchClose,
           icon: Icon(Icons.arrow_back, color: scheme.onSurfaceVariant),
-          tooltip: 'Close search',
+          tooltip: 'Close vault search',
           style: IconButton.styleFrom(shape: const CircleBorder()),
         ),
         Expanded(
           child: ListenableBuilder(
             listenable: searchController,
             builder: (context, _) {
-              return TextField(
+              return Semantics(
+                label: 'Search vault by title, author, mood, or reflection',
+                textField: true,
+                child: TextField(
                 controller: searchController,
                 focusNode: searchFocusNode,
                 autofocus: true,
@@ -115,6 +118,7 @@ class VaultAppBar extends StatelessWidget {
                   suffixIcon: searchController.text.isEmpty
                       ? null
                       : IconButton(
+                          tooltip: 'Clear search',
                           icon: Icon(
                             Icons.clear,
                             size: 20,
@@ -126,6 +130,7 @@ class VaultAppBar extends StatelessWidget {
                           },
                         ),
                 ),
+              ),
               );
             },
           ),

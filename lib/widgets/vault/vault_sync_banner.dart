@@ -96,9 +96,15 @@ class _BannerShell extends StatelessWidget {
               ),
             ),
             if (actionLabel != null && onAction != null)
-              TextButton(
-                onPressed: onAction,
-                child: Text(actionLabel!),
+              Semantics(
+                button: true,
+                label: actionLabel == 'Retry'
+                    ? 'Retry loading vault'
+                    : actionLabel,
+                child: TextButton(
+                  onPressed: onAction,
+                  child: Text(actionLabel!),
+                ),
               ),
           ],
         ),
