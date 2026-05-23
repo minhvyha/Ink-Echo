@@ -67,6 +67,55 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
   BookService get _bookService => widget.bookService ?? BookService.instance;
 
+  bool get _hasUnsavedChanges {
+    if (_isEditing) {
+      final b = widget.book!;
+      return _title.text.trim() != b.title.trim() ||
+          _author.text.trim() != b.author.trim() ||
+          _echo.text.trim() != b.echo.trim() ||
+          _mood != b.mood ||
+          _coverImageBase64 != b.coverImageBase64 ||
+          (_transcription ?? '') != (b.transcription ?? '');
+    }
+    return _title.text.trim().isNotEmpty ||
+        _author.text.trim().isNotEmpty ||
+        _echo.text.trim().isNotEmpty ||
+        _mood != null ||
+        (_coverImageBase64 != null && _coverImageBase64!.isNotEmpty) ||
+        (_transcription != null && _transcription!.isNotEmpty);
+  }
+
+  Future<bool> _confirmDiscardIfNeeded() async {
+    if (!_hasUnsavedChanges) return true;
+    final discard = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Discard changes?'),
+        content: const Text(
+          'You have unsaved edits. Leave without saving?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Keep editing'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Discard'),
+          ),
+        ],
+      ),
+    );
+    return discard ?? false;
+  }
+
+  Future<void> _requestClose() async {
+    if (!mounted) return;
+    if (await _confirmDiscardIfNeeded() && mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -363,7 +412,13 @@ class _ReflectionPageState extends State<ReflectionPage> {
     final coverBytes = _coverPreviewBytes;
     final palette = context.inkPalette;
 
-    return Scaffold(
+    return PopScope(
+      canPop: !_hasUnsavedChanges,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _requestClose();
+      },
+      child: Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -371,7 +426,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
             children: [
               AppHeader(
                 showClose: true,
-                onClose: () => Navigator.of(context).maybePop(),
+                onClose: _requestClose,
               ),
           const SizedBox(height: 6),
           Padding(
@@ -635,6 +690,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

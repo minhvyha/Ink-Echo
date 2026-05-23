@@ -234,9 +234,16 @@ class _BookDetailPageState extends State<BookDetailPage> {
                       const SizedBox(height: 18),
                     ],
                     _MetaRow(
-                      label: 'Saved',
-                      value: formatBookDate(book.createdAt),
+                      label: 'Added',
+                      value: formatBookDateLong(book.createdAt),
                     ),
+                    if (book.updatedAt != null) ...[
+                      const SizedBox(height: 8),
+                      _MetaRow(
+                        label: 'Last updated',
+                        value: formatBookDateLong(book.updatedAt),
+                      ),
+                    ],
                     const SizedBox(height: 8),
                     _MetaRow(
                       label: 'Reading time',
