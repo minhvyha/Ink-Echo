@@ -138,17 +138,23 @@ class _VaultPageState extends State<VaultPage> {
           }
 
           if (state.showOfflineEmpty) {
-            return _VaultOfflineEmpty(
-              onRetry: _retryVaultLoad,
-              topInset: VaultAppBar.totalHeight(context),
+            return _VaultRefreshableScroll(
+              onRefresh: _retryVaultLoad,
+              child: _VaultOfflineEmpty(
+                onRetry: _retryVaultLoad,
+                topInset: VaultAppBar.totalHeight(context),
+              ),
             );
           }
 
           if (state.hasError && state.books.isEmpty && !state.isLoading) {
-            return _VaultLoadError(
-              state: state,
-              onRetry: _retryVaultLoad,
-              topInset: VaultAppBar.totalHeight(context),
+            return _VaultRefreshableScroll(
+              onRefresh: _retryVaultLoad,
+              child: _VaultLoadError(
+                state: state,
+                onRetry: _retryVaultLoad,
+                topInset: VaultAppBar.totalHeight(context),
+              ),
             );
           }
 
@@ -158,7 +164,12 @@ class _VaultPageState extends State<VaultPage> {
 
           return Stack(
             children: [
-              CustomScrollView(
+              RefreshIndicator(
+                onRefresh: _retryVaultLoad,
+                child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
                 slivers: [
                   SliverToBoxAdapter(child: SizedBox(height: topBarHeight)),
                   SliverToBoxAdapter(
@@ -246,6 +257,7 @@ class _VaultPageState extends State<VaultPage> {
                   ),
                 ],
               ),
+              ),
               Positioned(
                 top: 0,
                 left: 0,
@@ -265,6 +277,37 @@ class _VaultPageState extends State<VaultPage> {
           );
         },
       ),
+    );
+  }
+}
+
+/// Pull-to-refresh wrapper for full-screen vault states (empty offline / error).
+class _VaultRefreshableScroll extends StatelessWidget {
+  final Future<void> Function() onRefresh;
+  final Widget child;
+
+  const _VaultRefreshableScroll({
+    required this.onRefresh,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return RefreshIndicator(
+          onRefresh: onRefresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }

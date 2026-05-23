@@ -32,6 +32,23 @@ void main() {
     expect(find.text('A remembered line'), findsOneWidget);
   });
 
+  testWidgets('shows Added and Last updated metadata', (tester) async {
+    final book = sampleBook(
+      createdAt: DateTime(2025, 5, 10),
+      updatedAt: DateTime(2025, 6, 1),
+    );
+
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(BookDetailPage(book: book)),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Added:'), findsOneWidget);
+    expect(find.textContaining('May 10, 2025'), findsOneWidget);
+    expect(find.textContaining('Last updated:'), findsOneWidget);
+    expect(find.textContaining('Jun 1, 2025'), findsOneWidget);
+  });
+
   testWidgets('shows edit and delete actions', (tester) async {
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(BookDetailPage(book: sampleBook())),

@@ -68,6 +68,7 @@ Book sampleBook({
   String? transcription,
   String? coverImageBase64,
   DateTime? createdAt,
+  DateTime? updatedAt,
 }) {
   return Book(
     id: id,
@@ -78,6 +79,7 @@ Book sampleBook({
     transcription: transcription,
     coverImageBase64: coverImageBase64,
     createdAt: createdAt ?? DateTime(2025, 5, 10),
+    updatedAt: updatedAt,
   );
 }
 

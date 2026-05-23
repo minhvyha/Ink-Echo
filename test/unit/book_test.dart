@@ -81,6 +81,7 @@ void main() {
       );
 
       expect(map['title'], 'T');
+      expect(map['updatedAt'], isA<FieldValue>());
       expect(map['mood'], isA<FieldValue>());
       expect(map['coverImageBase64'], isA<FieldValue>());
       expect(map['transcription'], isA<FieldValue>());
