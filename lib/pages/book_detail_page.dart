@@ -10,6 +10,7 @@ import 'package:inkandecho/services/book_service.dart';
 import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
+import 'package:inkandecho/utils/a11y_announce.dart';
 import 'package:inkandecho/utils/firestore_errors.dart';
 import 'package:inkandecho/widgets/ink_echo_brand.dart';
 
@@ -82,9 +83,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
     try {
       await _bookService.deleteBook(book.id);
       if (!mounted) return;
+      const deletedMessage = 'Entry deleted.';
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Entry deleted.')),
+        const SnackBar(content: Text(deletedMessage)),
       );
+      announceForAccessibility(context, deletedMessage);
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
@@ -136,6 +139,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                 children: [
                   IconButton(
                     icon: Icon(Icons.arrow_back, color: context.inkPrimaryText),
+                    tooltip: 'Back to vault',
                     onPressed: _deleting ? null : () => Navigator.of(context).pop(),
                   ),
                   const Expanded(child: Center(child: InkEchoBrand())),
@@ -262,7 +266,11 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     Row(
                       children: [
                         Expanded(
-                          child: OutlinedButton.icon(
+                          child: Semantics(
+                            button: true,
+                            label: 'Edit this entry',
+                            enabled: !_deleting,
+                            child: OutlinedButton.icon(
                             onPressed: _deleting ? null : _openEdit,
                             icon: const Icon(Icons.edit_outlined),
                             label: const Text('Edit'),
@@ -272,10 +280,15 @@ class _BookDetailPageState extends State<BookDetailPage> {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                           ),
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
-                          child: FilledButton.icon(
+                          child: Semantics(
+                            button: true,
+                            label: 'Delete this entry',
+                            enabled: !_deleting,
+                            child: FilledButton.icon(
                             onPressed: _deleting ? null : _confirmDelete,
                             icon: _deleting
                                 ? SizedBox(
@@ -293,6 +306,7 @@ class _BookDetailPageState extends State<BookDetailPage> {
                               foregroundColor: scheme.onError,
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
+                          ),
                           ),
                         ),
                       ],

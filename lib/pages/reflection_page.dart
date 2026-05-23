@@ -12,6 +12,7 @@ import '../widgets/common_buttons.dart';
 import '../services/book_service.dart';
 import '../utils/firestore_errors.dart';
 import '../utils/image_base64_encoder.dart';
+import '../utils/a11y_announce.dart';
 import '../utils/media_permissions.dart';
 import '../theme/ink_echo_palette.dart';
 import '../theme/ink_echo_theme.dart';
@@ -314,15 +315,13 @@ class _ReflectionPageState extends State<ReflectionPage> {
         );
       }
       if (!mounted) return;
+      final savedMessage = _isEditing
+          ? 'Entry updated.'
+          : 'Book saved to your shelf.';
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            _isEditing
-                ? 'Entry updated.'
-                : 'Book saved to your shelf.',
-          ),
-        ),
+        SnackBar(content: Text(savedMessage)),
       );
+      announceForAccessibility(context, savedMessage);
       if (!_isEditing) _clearForm();
       widget.onBookSaved?.call();
     } catch (e) {
@@ -454,7 +453,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
           const _FieldLabel('THE ECHO'),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: TextField(
+            child: Semantics(
+              label: 'Your reflection or favourite quote',
+              textField: true,
+              child: TextField(
               controller: _echo,
               minLines: 4,
               maxLines: 8,
@@ -487,6 +489,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                 contentPadding: const EdgeInsets.all(18),
               ),
             ),
+            ),
           ),
           const SizedBox(height: 18),
           const _FieldLabel('THE MOOD'),
@@ -510,7 +513,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
           const SizedBox(height: 24),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 22),
-            child: GestureDetector(
+            child: Semantics(
+              button: true,
+              label: 'Add or change cover photo',
+              child: GestureDetector(
               onTap: _showPhotoOptions,
               child: Container(
                 height: 250,
@@ -562,6 +568,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                                 color: Colors.black45,
                                 borderRadius: BorderRadius.circular(20),
                                 child: IconButton(
+                                  tooltip: 'Remove cover photo',
                                   icon: const Icon(
                                     Icons.close,
                                     color: Colors.white,
@@ -576,6 +583,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                         ),
                 ),
               ),
+            ),
             ),
           ),
           if (_transcription != null && _transcription!.isNotEmpty) ...[
@@ -598,6 +606,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
                     overflow: TextOverflow.ellipsis,
                   ),
                   trailing: IconButton(
+                    tooltip: 'Remove voice transcription',
                     icon: const Icon(Icons.delete_outline),
                     onPressed: () => setState(() => _transcription = null),
                   ),
@@ -612,6 +621,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
               text: _saving
                   ? 'Saving…'
                   : (_isEditing ? 'Save changes' : 'Save book'),
+              semanticLabel: _isEditing
+                  ? 'Save changes to this entry'
+                  : 'Save book to your vault',
               icon: Icons.arrow_forward,
               gradient: const LinearGradient(
                 colors: [Color(0xFF1B9C7A), Color(0xFF7FECBA)],
@@ -644,7 +656,10 @@ class _BookTextField extends StatelessWidget {
     final palette = context.inkPalette;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 22),
-      child: TextField(
+      child: Semantics(
+        label: hint,
+        textField: true,
+        child: TextField(
         controller: controller,
         textCapitalization: TextCapitalization.sentences,
         style: TextStyle(
@@ -675,6 +690,7 @@ class _BookTextField extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
           suffixIcon: Icon(icon, color: context.inkMuted, size: 22),
         ),
+      ),
       ),
     );
   }
@@ -714,7 +730,11 @@ class _MoodChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: selected ? '$text mood, selected' : '$text mood',
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -740,6 +760,7 @@ class _MoodChip extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
@@ -769,7 +790,16 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final actionLabel = icon == Icons.stop_rounded
+        ? 'Stop voice recording'
+        : label == 'SNAP A PHOTO'
+            ? 'Take cover photo, $subtitle'
+            : 'Record a voice thought, $subtitle';
+
+    return Semantics(
+      button: true,
+      label: actionLabel,
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -824,6 +854,7 @@ class _ActionCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

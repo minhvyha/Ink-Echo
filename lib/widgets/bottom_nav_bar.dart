@@ -83,7 +83,11 @@ class _NavPill extends StatelessWidget {
     final fg = selected ? scheme.onPrimaryContainer : scheme.onSurfaceVariant;
     final bg = selected ? scheme.primaryContainer : Colors.transparent;
 
-    return Material(
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '$label tab',
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -111,6 +115,7 @@ class _NavPill extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }

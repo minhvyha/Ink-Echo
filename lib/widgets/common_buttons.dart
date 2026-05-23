@@ -8,6 +8,7 @@ class GradientButton extends StatelessWidget {
   final IconData icon;
   final LinearGradient gradient;
   final VoidCallback? onPressed;
+  final String? semanticLabel;
 
   const GradientButton({
     super.key,
@@ -15,11 +16,16 @@ class GradientButton extends StatelessWidget {
     required this.icon,
     required this.gradient,
     this.onPressed,
+    this.semanticLabel,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    return Semantics(
+      button: true,
+      enabled: onPressed != null,
+      label: semanticLabel ?? text,
+      child: Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
@@ -57,6 +63,7 @@ class GradientButton extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 }
