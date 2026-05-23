@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// A single reading journal entry (book + reflection metadata).
 ///
 /// Maps to Firestore fields: title, author, echo, mood, coverImageBase64,
-/// transcription, createdAt.
+/// transcription, createdAt, updatedAt.
 class Book {
   final String id;
   final String title;
@@ -15,6 +15,7 @@ class Book {
   final String? coverImageBase64;
   final String? transcription;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const Book({
     required this.id,
@@ -25,16 +26,17 @@ class Book {
     this.coverImageBase64,
     this.transcription,
     this.createdAt,
+    this.updatedAt,
   });
 
   /// Builds a [Book] from a Firestore document snapshot.
   factory Book.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
-    final raw = data['createdAt'];
-    DateTime? created;
-    if (raw is Timestamp) {
-      created = raw.toDate();
+    DateTime? readTimestamp(Object? raw) {
+      if (raw is Timestamp) return raw.toDate();
+      return null;
     }
+
     return Book(
       id: doc.id,
       title: data['title'] as String? ?? '',
@@ -43,7 +45,8 @@ class Book {
       mood: data['mood'] as String?,
       coverImageBase64: data['coverImageBase64'] as String?,
       transcription: data['transcription'] as String?,
-      createdAt: created,
+      createdAt: readTimestamp(data['createdAt']),
+      updatedAt: readTimestamp(data['updatedAt']),
     );
   }
 
@@ -75,6 +78,7 @@ class Book {
       'title': title.trim(),
       'author': author.trim(),
       'echo': echo.trim(),
+      'updatedAt': FieldValue.serverTimestamp(),
     };
 
     final trimmedMood = mood?.trim();

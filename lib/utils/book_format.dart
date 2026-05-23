@@ -17,6 +17,16 @@ String formatBookDate(DateTime? date) {
 String formatBookDateLabel(DateTime? date) =>
     formatBookDate(date).toUpperCase();
 
+/// Longer date for detail metadata, e.g. "May 17, 2025".
+String formatBookDateLong(DateTime? date) {
+  if (date == null) return 'Recently';
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  return '${months[date.month - 1]} ${date.day}, ${date.year}';
+}
+
 /// Primary quote: echo text, else transcription, else placeholder.
 String quoteForBook(Book book) {
   final echo = book.echo.trim();

@@ -31,6 +31,23 @@ void main() {
     );
   });
 
+  testWidgets('close with unsaved text shows discard dialog', (tester) async {
+    useTallTestSurface(tester);
+    await tester.pumpWidget(
+      wrapWithInkEchoNavigator(const ReflectionPage(skipSpeechInit: true)),
+    );
+    await pumpBrief(tester, const Duration(milliseconds: 800));
+
+    await tester.enterText(_titleField, 'Draft title');
+    await tester.tap(find.byIcon(Icons.close));
+    await pumpBrief(tester);
+
+    expect(find.text('Discard changes?'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await pumpBrief(tester);
+    expect(find.text('Add a book'), findsOneWidget);
+  });
+
   testWidgets('close button pops navigator', (tester) async {
     await tester.pumpWidget(
       wrapWithInkEchoNavigator(

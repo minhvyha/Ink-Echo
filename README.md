@@ -21,17 +21,19 @@ After signing in, you build a personal **Vault** of book entries stored in the c
 
 ### Vault (home)
 - **Live library** of saved books from Cloud Firestore (`users/{uid}/books`).
+- **Pull to refresh** on the vault list (and offline/error empty states) to retry sync via `BookService.retryConnection()`.
 - **Bento layout**: featured card for the latest entry, scrollable entry cards, and a “Start a New Entry” prompt.
 - **Menu drawer**: quick links to add a reflection, open Settings, and **sort** entries (newest, oldest, title A–Z).
 - **Search**: filter entries by title, author, echo, mood, or transcription text.
 
 ### Add a reflection
 - Form for **title**, **author**, **echo** (reflection/quote), and **mood** (preset chips).
+- **Unsaved changes guard**: closing the form or using the system back gesture prompts to discard if you have edited fields without saving.
 - **Photo**: camera or gallery via `image_picker`; cover is compressed and stored as **base64** in Firestore (no separate Storage bucket required).
 - **Voice**: `speech_to_text` dictation; the **transcription** is saved as text with the entry (not an audio file).
 
 ### Entry detail
-- Read a full entry: cover image, echo, transcription, mood, and metadata.
+- Read a full entry: cover image, echo, transcription, mood, and metadata (**Added** date and **Last updated** after edits).
 - **Edit** reopens the reflection form with existing data; **Delete** removes the entry after confirmation.
 
 ### Settings & accessibility
@@ -108,7 +110,7 @@ test/unit/ + test/widget/     # Run: flutter test
 
 ### Firestore data model
 - Path: `users/{userId}/books/{bookId}`
-- Fields: `title`, `author`, `echo`, `mood?`, `coverImageBase64?`, `transcription?`, `createdAt` (server timestamp)
+- Fields: `title`, `author`, `echo`, `mood?`, `coverImageBase64?`, `transcription?`, `createdAt` (server timestamp on create), `updatedAt` (server timestamp on each update)
 - **Offline support:** Firestore persistence (`lib/services/firestore_bootstrap.dart`) caches vault data locally. `connectivity_plus` drives offline/sync banners on the vault (`VaultSyncBanner`), a full-screen offline empty state with **Try again**, load-error retry (`BookService.retryConnection`), and **Retry** snackbars on save/delete in reflection and detail screens.
 
 ### Running the app
@@ -190,7 +192,7 @@ flutter test
 
 **Widget tests** (`test/widget/`): login validation, vault list/search/navigation (injected `BookService`), reflection create/edit/save, book detail edit/delete confirmation, drawer, bento cards, settings, main shell, and common buttons. Shared helpers in `test/helpers/test_helpers.dart` (`createSeededBookService`, fake permissions).
 
-**94 tests** — run `flutter test` (all should pass).
+**97 tests** — run `flutter test` (all should pass).
 
 ---
 
@@ -199,11 +201,13 @@ flutter test
 ### What to evaluate
 1. **Sign-in** — email/password (and Google if configured).
 2. **Create** — menu or “Start a New Entry” → Add reflection → save with title + author; optional photo, mood, voice transcription.
-3. **Read** — entries appear in the Vault; tap for detail view.
-4. **Search & sort** — Vault app bar search; drawer sort options.
-5. **Settings** — accessibility toggles and sign out.
-6. **Screen readers** — enable TalkBack (Android) or VoiceOver (iOS); confirm icon buttons are announced clearly and save/delete are spoken aloud.
-7. **Privacy** — second account should not see the first account’s books (separate Firebase users).
+3. **Read** — entries appear in the Vault; tap for detail view (check **Added** / **Last updated** after editing).
+4. **Pull to refresh** — on the Vault, pull down to retry sync when offline or after errors.
+5. **Search & sort** — Vault app bar search; drawer sort options.
+6. **Unsaved guard** — start a new reflection, type a title, tap close; confirm discard dialog appears.
+7. **Settings** — accessibility toggles and sign out.
+8. **Screen readers** — enable TalkBack (Android) or VoiceOver (iOS); confirm icon buttons are announced clearly and save/delete are spoken aloud.
+9. **Privacy** — second account should not see the first account’s books (separate Firebase users).
 
 ### Known limitations (honest scope)
 - **Edit** opens the same form as “Add reflection”; there is no inline edit on the vault list itself.

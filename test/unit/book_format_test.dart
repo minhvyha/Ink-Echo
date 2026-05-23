@@ -11,6 +11,11 @@ void main() {
       expect(formatBookDateLabel(DateTime(2025, 5, 17)), 'MAY 17');
     });
 
+    test('formatBookDateLong includes year', () {
+      expect(formatBookDateLong(DateTime(2025, 5, 17)), 'May 17, 2025');
+      expect(formatBookDateLong(null), 'Recently');
+    });
+
     test('formatBookDate returns Recently when null', () {
       expect(formatBookDate(null), 'Recently');
     });
