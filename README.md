@@ -192,7 +192,7 @@ flutter test
 
 **Widget tests** (`test/widget/`): login validation, vault list/search/navigation (injected `BookService`), reflection create/edit/save, book detail edit/delete confirmation, drawer, bento cards, settings, main shell, and common buttons. Shared helpers in `test/helpers/test_helpers.dart` (`createSeededBookService`, fake permissions).
 
-**97 tests** — run `flutter test` (all should pass).
+**102 tests** — run `flutter test` (all should pass).
 
 ---
 

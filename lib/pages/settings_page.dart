@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/accessibility_settings.dart';
+import '../theme/ink_echo_palette.dart';
 import '../theme/ink_echo_theme.dart';
 import '../widgets/ink_echo_brand.dart';
 
@@ -206,7 +207,10 @@ class _SettingsGroup extends StatelessWidget {
               color: context.inkSurface,
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.6),
+                color: context.inkHighContrast
+                    ? Theme.of(context).colorScheme.outline
+                    : Theme.of(context).dividerColor.withValues(alpha: 0.6),
+                width: context.inkHighContrast ? 2 : 1,
               ),
             ),
             child: Column(

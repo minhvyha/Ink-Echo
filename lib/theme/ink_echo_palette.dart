@@ -66,6 +66,48 @@ class InkEchoPalette extends ThemeExtension<InkEchoPalette> {
     navUnselected: Color(0xFF9E9E9E),
   );
 
+  static const highContrastLight = InkEchoPalette(
+    inputFill: Colors.white,
+    border: Colors.black,
+    emptyNotice: Colors.white,
+    statCream: Color(0xFFFFFFFF),
+    statPeach: Color(0xFFFFE8E0),
+    actionGreenBg: Color(0xFFE0FFF5),
+    actionGreenBorder: Colors.black,
+    actionGreenIcon: Color(0xFF004D40),
+    actionPeachBg: Color(0xFFFFE0D6),
+    actionPeachBorder: Colors.black,
+    actionPeachIcon: Color(0xFF5C2E1F),
+    coverPlaceholder: Color(0xFFE8F5F0),
+    coverBorder: Colors.black,
+    transcriptionCard: Colors.white,
+    transcriptionBorder: Colors.black,
+    quoteOverlay: Color(0xE6FFFFFF),
+    googleButtonBg: Colors.white,
+    navUnselected: Color(0xFF333333),
+  );
+
+  static const highContrastDark = InkEchoPalette(
+    inputFill: Color(0xFF1A1A1A),
+    border: Colors.white,
+    emptyNotice: Color(0xFF1A1A1A),
+    statCream: Color(0xFF1A1A1A),
+    statPeach: Color(0xFF2A201E),
+    actionGreenBg: Color(0xFF0D2E26),
+    actionGreenBorder: Colors.white,
+    actionGreenIcon: Color(0xFFB8F5E8),
+    actionPeachBg: Color(0xFF2A201E),
+    actionPeachBorder: Colors.white,
+    actionPeachIcon: Color(0xFFFFD4C8),
+    coverPlaceholder: Color(0xFF1A2A24),
+    coverBorder: Colors.white,
+    transcriptionCard: Color(0xFF1A1A1A),
+    transcriptionBorder: Colors.white,
+    quoteOverlay: Color(0xCC000000),
+    googleButtonBg: Color(0xFF1A1A1A),
+    navUnselected: Color(0xFFCCCCCC),
+  );
+
   static const dark = InkEchoPalette(
     inputFill: Color(0xFF333330),
     border: Color(0xFF4A4A46),
@@ -160,4 +202,39 @@ class InkEchoPalette extends ThemeExtension<InkEchoPalette> {
 extension InkEchoPaletteContext on BuildContext {
   InkEchoPalette get inkPalette =>
       Theme.of(this).extension<InkEchoPalette>() ?? InkEchoPalette.light;
+
+  bool get inkHighContrast =>
+      Theme.of(this).extension<InkEchoAccessibility>()?.highContrast ?? false;
+}
+
+/// Flags for accessibility-driven theme behavior (cards, typography).
+@immutable
+class InkEchoAccessibility extends ThemeExtension<InkEchoAccessibility> {
+  final bool highContrast;
+  final bool reduceMotion;
+
+  const InkEchoAccessibility({
+    this.highContrast = false,
+    this.reduceMotion = false,
+  });
+
+  @override
+  InkEchoAccessibility copyWith({
+    bool? highContrast,
+    bool? reduceMotion,
+  }) {
+    return InkEchoAccessibility(
+      highContrast: highContrast ?? this.highContrast,
+      reduceMotion: reduceMotion ?? this.reduceMotion,
+    );
+  }
+
+  @override
+  InkEchoAccessibility lerp(
+    ThemeExtension<InkEchoAccessibility>? other,
+    double t,
+  ) {
+    if (other is! InkEchoAccessibility) return this;
+    return t < 0.5 ? this : other;
+  }
 }
