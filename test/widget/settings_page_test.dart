@@ -75,4 +75,27 @@ void main() {
       InkEchoPalette.highContrastLight,
     );
   });
+
+  testWidgets('sign out asks for confirmation', (tester) async {
+    var loggedOut = false;
+    useTallTestSurface(tester);
+    await tester.pumpWidget(
+      wrapWithInkEchoTheme(SettingsPage(onLogout: () => loggedOut = true)),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Sign out'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sign out?'), findsOneWidget);
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    expect(loggedOut, isFalse);
+
+    await tester.tap(find.text('Sign out').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Sign out'));
+    await tester.pumpAndSettle();
+    expect(loggedOut, isTrue);
+  });
 }

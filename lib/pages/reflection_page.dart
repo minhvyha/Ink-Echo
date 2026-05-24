@@ -10,7 +10,7 @@ import 'package:inkandecho/models/book.dart';
 import '../widgets/app_header.dart';
 import '../widgets/common_buttons.dart';
 import '../services/book_service.dart';
-import '../utils/firestore_errors.dart';
+import '../utils/user_errors.dart';
 import '../utils/image_base64_encoder.dart';
 import '../utils/a11y_announce.dart';
 import '../utils/media_permissions.dart';
@@ -87,26 +87,14 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
   Future<bool> _confirmDiscardIfNeeded() async {
     if (!_hasUnsavedChanges) return true;
-    final discard = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Discard changes?'),
-        content: const Text(
-          'You have unsaved edits. Leave without saving?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Keep editing'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Discard'),
-          ),
-        ],
-      ),
+    return confirmTrustAction(
+      context,
+      title: 'Discard changes?',
+      message: 'You have unsaved edits. Leave without saving?',
+      confirmLabel: 'Discard',
+      cancelLabel: 'Keep editing',
+      destructive: true,
     );
-    return discard ?? false;
   }
 
   Future<void> _requestClose() async {
@@ -171,8 +159,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
         : await ensurePhotosPermission();
     if (!allowed) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Camera or photo permission is required.')),
+      showTrustSnackBar(
+        context,
+        message: 'Camera or photo permission is required.',
       );
       return;
     }
@@ -190,12 +179,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
       if (!mounted) return;
 
       if (encoded == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
+        showTrustSnackBar(
+          context,
+          message:
               'Image is too large even after compression. Try a smaller photo.',
-            ),
-          ),
         );
         return;
       }
@@ -203,9 +190,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
       setState(() => _coverImageBase64 = encoded);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not pick image: $e')),
-      );
+      showTrustErrorSnackBar(context, e);
     }
   }
 
@@ -257,10 +242,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
     }
 
     if (!_speechAvailable) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Speech recognition is not available on this device.'),
-        ),
+      showTrustSnackBar(
+        context,
+        message: 'Speech recognition is not available on this device.',
       );
       return;
     }
@@ -268,8 +252,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
     final allowed = await ensureMicrophonePermission();
     if (!allowed) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Microphone permission is required.')),
+      showTrustSnackBar(
+        context,
+        message: 'Microphone permission is required.',
       );
       return;
     }
@@ -300,9 +285,7 @@ class _ReflectionPageState extends State<ReflectionPage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isListening = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not start listening: $e')),
-      );
+      showTrustErrorSnackBar(context, e);
     }
   }
 
@@ -324,8 +307,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
   Future<void> _saveBook() async {
     if (_saving) return;
     if (_isListening) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stop listening before saving.')),
+      showTrustSnackBar(
+        context,
+        message: 'Stop listening before saving.',
       );
       return;
     }
@@ -333,10 +317,9 @@ class _ReflectionPageState extends State<ReflectionPage> {
     final title = _title.text.trim();
     final author = _author.text.trim();
     if (title.isEmpty || author.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please add a title and author before saving.'),
-        ),
+      showTrustSnackBar(
+        context,
+        message: 'Please add a title and author before saving.',
       );
       return;
     }
@@ -367,27 +350,18 @@ class _ReflectionPageState extends State<ReflectionPage> {
       final savedMessage = _isEditing
           ? 'Entry updated.'
           : 'Book saved to your shelf.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(savedMessage)),
-      );
+      showTrustSuccessSnackBar(context, savedMessage);
       announceForAccessibility(context, savedMessage);
       if (!_isEditing) _clearForm();
       widget.onBookSaved?.call();
     } catch (e) {
       if (!mounted) return;
-      final offline = isLikelyOfflineError(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            offline
-                ? '${messageForFirestoreError(e)} Your entry will sync when you reconnect.'
-                : messageForFirestoreError(e),
-          ),
-          action: SnackBarAction(
-            label: 'Retry',
-            onPressed: _saveBook,
-          ),
-        ),
+      final parsed = UserFacingError.from(e);
+      showTrustErrorSnackBar(
+        context,
+        e,
+        onRetry: _saveBook,
+        offlineNote: parsed.isOffline ? kOfflineWriteNote : null,
       );
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -420,13 +394,24 @@ class _ReflectionPageState extends State<ReflectionPage> {
       },
       child: Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (_saving)
+              LinearProgressIndicator(
+                minHeight: 3,
+                color: context.inkAccent,
+                backgroundColor: palette.border.withValues(alpha: 0.4),
+              ),
+            Expanded(
+              child: AbsorbPointer(
+                absorbing: _saving,
+                child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AppHeader(
                 showClose: true,
-                onClose: _requestClose,
+                onClose: _saving ? null : _requestClose,
               ),
           const SizedBox(height: 6),
           Padding(
@@ -689,6 +674,10 @@ class _ReflectionPageState extends State<ReflectionPage> {
               const SizedBox(height: 30),
             ],
           ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       ),

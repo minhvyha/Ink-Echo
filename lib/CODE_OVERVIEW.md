@@ -39,6 +39,8 @@ Firestore path: `users/{uid}/books/{bookId}`.
 - `utils/vault_book_list.dart` — client search/sort
 - `utils/book_format.dart` — card display helpers
 - `utils/image_base64_encoder.dart` — cover compression for Firestore
+- `utils/user_errors.dart` — friendly errors, snackbars, confirm dialogs
+- `widgets/offline_status_chip.dart` — app-bar offline indicator
 
 ## Tests
 

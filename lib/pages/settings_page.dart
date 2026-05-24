@@ -5,13 +5,27 @@ import 'package:flutter/material.dart';
 import '../services/accessibility_settings.dart';
 import '../theme/ink_echo_palette.dart';
 import '../theme/ink_echo_theme.dart';
+import '../utils/user_errors.dart';
 import '../widgets/ink_echo_brand.dart';
+import '../widgets/offline_status_chip.dart';
 
 /// Second tab in [MainShell]; changes persist via [AccessibilitySettings].
 class SettingsPage extends StatelessWidget {
   final VoidCallback onLogout;
 
   const SettingsPage({super.key, required this.onLogout});
+
+  Future<void> _confirmSignOut(BuildContext context) async {
+    final confirmed = await confirmTrustAction(
+      context,
+      title: 'Sign out?',
+      message:
+          'You will return to the sign-in screen. Your vault stays saved in the cloud.',
+      confirmLabel: 'Sign out',
+      destructive: true,
+    );
+    if (confirmed) onLogout();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +44,14 @@ class SettingsPage extends StatelessWidget {
                 bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                  child: const Center(child: InkEchoBrand()),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkEchoBrand(),
+                      SizedBox(width: 8),
+                      OfflineStatusChip(),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
@@ -139,7 +160,7 @@ class SettingsPage extends StatelessWidget {
                   width: double.infinity,
                   height: 56,
                   child: OutlinedButton.icon(
-                    onPressed: onLogout,
+                    onPressed: () => _confirmSignOut(context),
                     icon: Icon(
                       Icons.logout,
                       color: Theme.of(context).colorScheme.error,

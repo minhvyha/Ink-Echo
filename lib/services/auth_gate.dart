@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:inkandecho/services/auth_service.dart';
 import 'package:inkandecho/pages/login_page.dart';
 import 'package:inkandecho/pages/main_shell.dart';
+import 'package:inkandecho/widgets/trust_error_panel.dart';
 
 /// Root navigator: shows login until [User] is non-null, then the main app.
 ///
@@ -26,8 +27,9 @@ class AuthGate extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Scaffold(
-            body: Center(
-              child: Text('Auth error: ${snapshot.error}'),
+            body: TrustErrorPanel(
+              error: snapshot.error!,
+              icon: Icons.lock_outline,
             ),
           );
         }
