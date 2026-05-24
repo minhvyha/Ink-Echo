@@ -11,8 +11,9 @@ import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 import 'package:inkandecho/utils/book_format.dart';
 import 'package:inkandecho/utils/a11y_announce.dart';
-import 'package:inkandecho/utils/firestore_errors.dart';
+import 'package:inkandecho/utils/user_errors.dart';
 import 'package:inkandecho/widgets/ink_echo_brand.dart';
+import 'package:inkandecho/widgets/offline_status_chip.dart';
 
 /// Shows one [Book]; edit opens [ReflectionPage], delete calls [BookService.deleteBook].
 class BookDetailPage extends StatefulWidget {
@@ -84,26 +85,17 @@ class _BookDetailPageState extends State<BookDetailPage> {
       await _bookService.deleteBook(book.id);
       if (!mounted) return;
       const deletedMessage = 'Entry deleted.';
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(deletedMessage)),
-      );
+      showTrustSuccessSnackBar(context, deletedMessage);
       announceForAccessibility(context, deletedMessage);
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
-      final offline = isLikelyOfflineError(e);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            offline
-                ? '${messageForFirestoreError(e)} The entry will be removed when you reconnect.'
-                : messageForFirestoreError(e),
-          ),
-          action: SnackBarAction(
-            label: 'Retry',
-            onPressed: _confirmDelete,
-          ),
-        ),
+      final parsed = UserFacingError.from(e);
+      showTrustErrorSnackBar(
+        context,
+        e,
+        onRetry: _confirmDelete,
+        offlineNote: parsed.isOffline ? kOfflineDeleteNote : null,
       );
     } finally {
       if (mounted) setState(() => _deleting = false);
@@ -143,7 +135,8 @@ class _BookDetailPageState extends State<BookDetailPage> {
                     onPressed: _deleting ? null : () => Navigator.of(context).pop(),
                   ),
                   const Expanded(child: Center(child: InkEchoBrand())),
-                  const SizedBox(width: 48),
+                  const OfflineStatusChip(),
+                  const SizedBox(width: 8),
                 ],
               ),
             ),

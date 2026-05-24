@@ -2,9 +2,15 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'ink_echo_palette.dart';
 
 /// Text styles for vault, cards, and headers (theme-aware colors).
 extension InkEchoTypography on BuildContext {
+  Color get _bodyMutedColor {
+    final scheme = Theme.of(this).colorScheme;
+    final hc = Theme.of(this).extension<InkEchoAccessibility>()?.highContrast;
+    return hc == true ? scheme.onSurface : scheme.onSurfaceVariant;
+  }
   TextStyle get vaultDisplayLg => GoogleFonts.playfairDisplay(
         fontSize: 40,
         height: 48 / 40,
@@ -24,7 +30,7 @@ extension InkEchoTypography on BuildContext {
         fontSize: 18,
         height: 28 / 18,
         fontWeight: FontWeight.w400,
-        color: Theme.of(this).colorScheme.onSurfaceVariant,
+        color: _bodyMutedColor,
       );
 
   TextStyle get vaultHeadline => GoogleFonts.inter(
@@ -39,7 +45,7 @@ extension InkEchoTypography on BuildContext {
         height: 34 / 22,
         fontStyle: FontStyle.italic,
         fontWeight: FontWeight.w400,
-        color: Theme.of(this).colorScheme.onSurfaceVariant,
+        color: _bodyMutedColor,
       );
 
   TextStyle get vaultLabelSm => GoogleFonts.inter(

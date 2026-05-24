@@ -67,6 +67,50 @@ abstract final class InkEchoTokens {
         surfaceContainerLowest: surfaceContainerLowest,
       );
 
+  /// Strong black-on-white palette for accessibility.
+  static ColorScheme highContrastLightScheme() => lightScheme().copyWith(
+        surface: Colors.white,
+        onSurface: Colors.black,
+        onSurfaceVariant: Colors.black,
+        surfaceContainerLowest: Colors.white,
+        surfaceContainerLow: Color(0xFFF0F0F0),
+        surfaceContainer: Color(0xFFE8E8E8),
+        surfaceContainerHigh: Color(0xFFE0E0E0),
+        surfaceContainerHighest: Color(0xFFD8D8D8),
+        outline: Colors.black,
+        outlineVariant: Color(0xFF333333),
+        primary: Color(0xFF004D40),
+        onPrimary: Colors.white,
+        primaryContainer: Color(0xFFB8E8DE),
+        onPrimaryContainer: Colors.black,
+        secondary: Color(0xFF5C2E1F),
+        onSecondary: Colors.white,
+        secondaryContainer: Color(0xFFFFC9B8),
+        onSecondaryContainer: Colors.black,
+      );
+
+  /// Strong white-on-black palette for accessibility.
+  static ColorScheme highContrastDarkScheme() => darkScheme().copyWith(
+        surface: Colors.black,
+        onSurface: Colors.white,
+        onSurfaceVariant: Colors.white,
+        surfaceContainerLowest: Color(0xFF0A0A0A),
+        surfaceContainerLow: Color(0xFF141414),
+        surfaceContainer: Color(0xFF1E1E1E),
+        surfaceContainerHigh: Color(0xFF282828),
+        surfaceContainerHighest: Color(0xFF333333),
+        outline: Colors.white,
+        outlineVariant: Color(0xFFCCCCCC),
+        primary: Color(0xFFB8F5E8),
+        onPrimary: Colors.black,
+        primaryContainer: Color(0xFF1D6053),
+        onPrimaryContainer: Colors.white,
+        secondary: Color(0xFFFFD4C8),
+        onSecondary: Colors.black,
+        secondaryContainer: Color(0xFF6B3929),
+        onSecondaryContainer: Colors.white,
+      );
+
   static ColorScheme darkScheme() => const ColorScheme(
         brightness: Brightness.dark,
         primary: Color(0xFF93D3C3),

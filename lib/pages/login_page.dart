@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:inkandecho/services/auth_service.dart';
+import 'package:inkandecho/utils/user_errors.dart';
 import 'package:inkandecho/theme/ink_echo_palette.dart';
 import 'package:inkandecho/theme/ink_echo_theme.dart';
 
@@ -40,9 +41,7 @@ class _LoginPageState extends State<LoginPage> {
       await action();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AuthService.messageForAuthError(e))),
-      );
+      showTrustErrorSnackBar(context, e, onRetry: () => _runAuth(action));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -71,9 +70,7 @@ class _LoginPageState extends State<LoginPage> {
       await AuthService.instance.signInWithGoogle();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AuthService.messageForAuthError(e))),
-      );
+      showTrustErrorSnackBar(context, e, onRetry: _signInWithGoogle);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -82,8 +79,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _resetPassword() async {
     final email = _email.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter your email to reset your password.')),
+      showTrustSnackBar(
+        context,
+        message: 'Enter your email to reset your password.',
       );
       return;
     }
@@ -91,14 +89,13 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await AuthService.instance.sendPasswordResetEmail(email);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset email sent.')),
+      showTrustSuccessSnackBar(
+        context,
+        'Password reset email sent.',
       );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AuthService.messageForAuthError(e))),
-      );
+      showTrustErrorSnackBar(context, e, onRetry: _resetPassword);
     } finally {
       if (mounted) setState(() => _loading = false);
     }

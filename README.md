@@ -37,9 +37,16 @@ After signing in, you build a personal **Vault** of book entries stored in the c
 - **Edit** reopens the reflection form with existing data; **Delete** removes the entry after confirmation.
 
 ### Settings & accessibility
-- Account summary and **sign out**.
+- Account summary and **sign out** (with confirmation dialog).
 - **Dark mode**, text size, bold text, high contrast, and reduce motion (persisted with `shared_preferences`).
 - **Screen reader support:** descriptive labels on vault, reflection, and detail actions; TalkBack/VoiceOver announcements when an entry is saved or deleted (`lib/utils/a11y_announce.dart`).
+
+### Trust & error handling
+- **Offline badge** in vault, reflection, detail, and settings app bars (`OfflineStatusChip`) — visible whenever the device has no network.
+- **Unified error copy** via `lib/utils/user_errors.dart` (Firestore, auth, network, permissions) with **Retry** on recoverable failures.
+- **Vault:** sync banners, pull-to-refresh, offline empty state, and full-screen load-error panel with **Try again**.
+- **Reflection:** linear progress while saving, form disabled during save, friendly messages for photo/voice/validation failures.
+- **Sign out:** confirmation before logging out (`confirmTrustAction`).
 
 ### Assignment requirements (summary)
 
@@ -111,7 +118,7 @@ test/unit/ + test/widget/     # Run: flutter test
 ### Firestore data model
 - Path: `users/{userId}/books/{bookId}`
 - Fields: `title`, `author`, `echo`, `mood?`, `coverImageBase64?`, `transcription?`, `createdAt` (server timestamp on create), `updatedAt` (server timestamp on each update)
-- **Offline support:** Firestore persistence (`lib/services/firestore_bootstrap.dart`) caches vault data locally. `connectivity_plus` drives offline/sync banners on the vault (`VaultSyncBanner`), a full-screen offline empty state with **Try again**, load-error retry (`BookService.retryConnection`), and **Retry** snackbars on save/delete in reflection and detail screens.
+- **Offline support:** Firestore persistence (`lib/services/firestore_bootstrap.dart`) caches vault data locally. `connectivity_plus` drives offline/sync banners on the vault (`VaultSyncBanner`), app-bar **Offline** chips, a full-screen offline empty state with **Try again**, load-error retry (`BookService.retryConnection`), and **Retry** snackbars on save/delete (`user_errors.dart`).
 
 ### Running the app
 
@@ -192,7 +199,7 @@ flutter test
 
 **Widget tests** (`test/widget/`): login validation, vault list/search/navigation (injected `BookService`), reflection create/edit/save, book detail edit/delete confirmation, drawer, bento cards, settings, main shell, and common buttons. Shared helpers in `test/helpers/test_helpers.dart` (`createSeededBookService`, fake permissions).
 
-**97 tests** — run `flutter test` (all should pass).
+**109 tests** — run `flutter test` (all should pass).
 
 ---
 
@@ -205,9 +212,10 @@ flutter test
 4. **Pull to refresh** — on the Vault, pull down to retry sync when offline or after errors.
 5. **Search & sort** — Vault app bar search; drawer sort options.
 6. **Unsaved guard** — start a new reflection, type a title, tap close; confirm discard dialog appears.
-7. **Settings** — accessibility toggles and sign out.
-8. **Screen readers** — enable TalkBack (Android) or VoiceOver (iOS); confirm icon buttons are announced clearly and save/delete are spoken aloud.
-9. **Privacy** — second account should not see the first account’s books (separate Firebase users).
+7. **Trust & errors** — turn off network: **Offline** chip appears in the app bar; vault shows offline banner or empty state; save/delete show retry snackbars. Sign out asks for confirmation.
+8. **Settings** — accessibility toggles and sign out.
+9. **Screen readers** — enable TalkBack (Android) or VoiceOver (iOS); confirm icon buttons are announced clearly and save/delete are spoken aloud.
+10. **Privacy** — second account should not see the first account’s books (separate Firebase users).
 
 ### Known limitations (honest scope)
 - **Edit** opens the same form as “Add reflection”; there is no inline edit on the vault list itself.

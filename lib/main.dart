@@ -39,9 +39,21 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Ink & Echo',
-          theme: InkEchoTheme.light(highContrast: a11y.highContrast),
-          darkTheme: InkEchoTheme.dark(highContrast: a11y.highContrast),
+          theme: InkEchoTheme.light(
+            highContrast: a11y.highContrast,
+            reduceMotion: a11y.reduceMotion,
+          ),
+          darkTheme: InkEchoTheme.dark(
+            highContrast: a11y.highContrast,
+            reduceMotion: a11y.reduceMotion,
+          ),
           themeMode: a11y.darkMode ? ThemeMode.dark : ThemeMode.light,
+          themeAnimationDuration: a11y.reduceMotion
+              ? Duration.zero
+              : const Duration(milliseconds: 300),
+          themeAnimationCurve: a11y.reduceMotion
+              ? Curves.linear
+              : Curves.easeInOut,
           // Respect system-wide a11y toggles from Settings.
           builder: (context, child) {
             final media = MediaQuery.of(context);

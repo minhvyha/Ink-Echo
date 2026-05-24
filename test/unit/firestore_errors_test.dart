@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:inkandecho/utils/firestore_errors.dart';
@@ -17,6 +19,14 @@ void main() {
         ),
         isTrue,
       );
+    });
+
+    test('maps SocketException as offline', () {
+      expect(
+        messageForFirestoreError(const SocketException('failed')),
+        contains('offline'),
+      );
+      expect(isLikelyOfflineError(const SocketException('failed')), isTrue);
     });
 
     test('maps permission and not-found codes', () {

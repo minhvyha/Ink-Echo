@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:inkandecho/theme/ink_echo_typography.dart';
 import '../ink_echo_brand.dart';
+import '../offline_status_chip.dart';
 
 /// Overlay app bar; [totalHeight] includes notch/status bar for list padding.
 class VaultAppBar extends StatelessWidget {
@@ -64,6 +65,7 @@ class VaultAppBar extends StatelessWidget {
           style: IconButton.styleFrom(shape: const CircleBorder()),
         ),
         const Expanded(child: Center(child: InkEchoBrand())),
+        const OfflineStatusChip(),
         IconButton(
           onPressed: onSearchTap,
           icon: Icon(Icons.search, color: scheme.onSurfaceVariant),

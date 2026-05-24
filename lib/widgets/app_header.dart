@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'ink_echo_brand.dart';
+import 'offline_status_chip.dart';
 
 /// Used on [ReflectionPage]; [showClose] pops the route when tapped.
 class AppHeader extends StatelessWidget {
@@ -26,6 +27,7 @@ class AppHeader extends StatelessWidget {
         children: [
           const InkEchoBrand(),
           const Spacer(),
+          const OfflineStatusChip(),
           if (showSearch)
             IconButton(
               onPressed: () {},
@@ -36,7 +38,7 @@ class AppHeader extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.close, color: scheme.onSurfaceVariant),
               tooltip: 'Close reflection form',
-              onPressed: onClose ?? () => Navigator.of(context).maybePop(),
+              onPressed: onClose,
               style: IconButton.styleFrom(shape: const CircleBorder()),
             ),
         ],
